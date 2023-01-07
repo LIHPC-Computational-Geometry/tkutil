@@ -46,8 +46,8 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh 
         spack load cmake
-        mkdir ${{github.workspace}}/build_lib
-        cd ${{github.workspace}}/build_lib
+        mkdir build_lib
+        cd build_lib
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
         -DUSE_PYTHON_3=ON 
         -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local_install
