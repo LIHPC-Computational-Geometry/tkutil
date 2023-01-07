@@ -12,7 +12,9 @@ jobs:
     name: ${{ matrix.config }}
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Linux, Windows or Mac. 
-    runs-on:  ubuntu-latest
+    runs-on:  ubuntu-20.04
+    container: 
+      image: ghcr.io/lihpc-computational-geometry/mgx-ubuntu.20.04-spack-0.19.0
     strategy:
       fail-fast: false
       matrix:
