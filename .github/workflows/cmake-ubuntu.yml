@@ -39,7 +39,7 @@ jobs:
       # subsequent commands
       run: |
         source /spack/share/spack/setup-env.sh
-        spack load cmake
+        spack load cmake 
         cmake -E make_directory ${{github.workspace}}/build_lib
 
     - name: Configure CMake
