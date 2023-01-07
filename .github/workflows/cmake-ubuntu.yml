@@ -35,19 +35,9 @@ jobs:
         spack repo add ./spack_recipes_meshing/supersede_repo 
 
     - name: Create Build Environment
-      # We create a subdirectory that will stand as our working directory for all 
-      # subsequent commands
-      shell: bash
-      run: |
-        source /spack/share/spack/setup-env.sh
-        spack load cmake 
-        cmake -E make_directory ${{github.workspace}}/build_lib
-
-    - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
       # access regardless of the host operating system
       shell: bash
-      working-directory: ${{github.workspace}}/build_lib
       # Note the current convention is to use the -S and -B options here to specify source
       # and build directories, but this is only available with CMake 3.13 and higher.
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
@@ -56,6 +46,8 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh 
         spack load cmake
+        mkdir ${{github.workspace}}/build_lib
+        cd ${{github.workspace}}/build_lib
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
         -DUSE_PYTHON_3=ON 
         -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local_install
@@ -73,6 +65,7 @@ jobs:
 
     - name: Install
       shell: bash
+      working-directory: ${{github.workspace}}/build_lib
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
