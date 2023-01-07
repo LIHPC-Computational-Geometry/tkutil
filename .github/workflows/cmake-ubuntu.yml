@@ -51,7 +51,7 @@ jobs:
         mkdir build_lib
         mkdir local_install
         cd build_lib
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/local_install
+        cmake ../ -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local_install
 
     - name: Build
       # Use a bash shell so we can use the same syntax for environment variable
@@ -72,10 +72,11 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
+        cd build_lib
         if ${{ matrix.config == 'Release'}}; then
-            cmake --install build_lib --prefix ${{github.workspace}}/local_install --config Release
-        else
-            cmake --install build_lib --prefix ${{github.workspace}}/local_install --config Debug
+            cmake --install .  --config Release
+        else 
+            cmake --install . --config Debug
         fi
 
     - name: Test lib install
