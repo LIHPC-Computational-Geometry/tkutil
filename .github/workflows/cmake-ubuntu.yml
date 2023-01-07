@@ -72,7 +72,6 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
-        cd build_lib
         if ${{ matrix.config == 'Release'}}; then
             cmake --install .  --config Release
         else 
