@@ -49,6 +49,7 @@ jobs:
         spack load python
         spack load swig
         mkdir build_lib
+        mkdir local_install
         cd build_lib
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
         -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local_install
