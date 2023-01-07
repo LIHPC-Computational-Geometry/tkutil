@@ -83,9 +83,8 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
-        spack load tkutil
-        cd test_link/
-        cmake -S . -B build_exe
+        cd test_link
+        cmake -DCMAKE_PREFIX_PATH="${{github.workspace}}/local_install" -S . -B build_exe
         cmake --build build_exe
         cd build_exe
         ctest
