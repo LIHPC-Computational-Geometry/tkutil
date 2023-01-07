@@ -51,7 +51,7 @@ jobs:
         mkdir build_lib
         mkdir local_install
         cd build_lib
-        cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
 
     - name: Build
       # Use a bash shell so we can use the same syntax for environment variable
