@@ -1,4 +1,4 @@
-name: spack-install-ubuntu
+name: spack-ubuntu
 
 on:
   workflow_dispatch:
