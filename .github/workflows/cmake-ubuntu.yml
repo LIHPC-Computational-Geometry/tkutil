@@ -46,6 +46,8 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh 
         spack load cmake
+        spack load python
+        spack load swig
         mkdir build_lib
         cd build_lib
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
@@ -61,6 +63,8 @@ jobs:
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
+        spack load python
+        spack load swig
         cmake --build . --config ${{ matrix.config }}
 
     - name: Install
