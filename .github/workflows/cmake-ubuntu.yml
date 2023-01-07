@@ -37,6 +37,7 @@ jobs:
     - name: Create Build Environment
       # We create a subdirectory that will stand as our working directory for all 
       # subsequent commands
+      shell: bash
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake 
@@ -71,6 +72,7 @@ jobs:
         cmake --build . --config ${{ matrix.config }}
 
     - name: Install
+      shell: bash
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
@@ -81,6 +83,7 @@ jobs:
         fi
 
     - name: Test lib install
+      shell: bash
       run: |
         source /spack/share/spack/setup-env.sh
         spack load cmake
