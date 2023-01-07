@@ -1,4 +1,4 @@
-name: install-link-ubuntu
+name: cmake-ubuntu
 
 on:
   workflow_dispatch:
