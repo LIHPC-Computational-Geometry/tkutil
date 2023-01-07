@@ -13,6 +13,8 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Linux, Windows or Mac. 
     runs-on:  ubuntu-latest
+    container:
+      image: aberzen/mgx-ubuntu.20.04-spack.0.19.0
     strategy:
       fail-fast: false
       matrix:
@@ -25,10 +27,13 @@ jobs:
         submodules: recursive
 
     - name: Initialize the dev environment
-      run : >
-        chmod +x ./.github/workflows/env_linux.sh; ./.github/workflows/env_linux.sh
-        apt-get install swig -y
-    
+      shell: bash
+      run: |
+        source /spack/share/spack/setup-env.sh
+        git clone --depth=1 https://github.com/LIHPC-Computational-Geometry/spack_recipes_meshing.git
+        spack repo add ./spack_recipes_meshing/meshing_repo
+        spack repo add ./spack_recipes_meshing/supersede_repo 
+
     - name: Create Build Environment
       # We create a subdirectory that will stand as our working directory for all 
       # subsequent commands
@@ -44,10 +49,11 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       # CMAKE_INSTALL_PREFIX is specified here because of issue 20565 where CMAKE_INSTALL_LIBDIR
       # does not seem to be re-evaluated during the call to cmake --install
-      run: >
+      run: |
+        source /spack/share/spack/setup-env.sh 
+        spack load cmake
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.config }} 
         -DUSE_PYTHON_3=ON 
-        -DCMAKE_PREFIX_PATH="${{github.workspace}}/spack/opt/spack/lcov;"
         -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/local_install
 
     - name: Build
@@ -56,10 +62,15 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}/build_lib
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config ${{ matrix.config }}
+      run: |
+        source /spack/share/spack/setup-env.sh
+        spack load cmake
+        cmake --build . --config ${{ matrix.config }}
 
     - name: Install
       run: |
+        source /spack/share/spack/setup-env.sh
+        spack load cmake
         if ${{ matrix.config == 'Release'}}; then
             cmake --install build_lib --prefix ${{github.workspace}}/local_install --config Release
         else
@@ -68,6 +79,8 @@ jobs:
 
     - name: Test lib install
       run: |
+        source /spack/share/spack/setup-env.sh
+        spack load cmake
         cmake -E make_directory ${{github.workspace}}/test_link
         cd ${{github.workspace}}/test_link/
         cmake -DCMAKE_PREFIX_PATH="${{github.workspace}}/local_install" -S ${{github.workspace}}/test_link -B build_exe
