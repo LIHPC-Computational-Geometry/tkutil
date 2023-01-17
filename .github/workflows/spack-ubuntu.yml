@@ -61,5 +61,4 @@ jobs:
           cmake -S . -B build_exe
           cmake --build build_exe
           cd build_exe
-          ./test_link
-          #ctest
+          ctest
