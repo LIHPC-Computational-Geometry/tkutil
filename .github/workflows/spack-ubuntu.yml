@@ -47,8 +47,8 @@ jobs:
           # now we build using cmake with spack provided build variables
           spack load --only dependencies --sh tkutil > spack_env_file.sh
           source spack_env_file.sh
-          cmake -DCMAKE_INSTALL_PREFIX=${{env.INSTALL_DIR}} .
-          make -j
+          cmake -DCMAKE_INSTALL_PREFIX=${{env.INSTALL_DIR}} -S . -B build
+          cmake --build build
           #make test
 
       - name: Test c++ lib install
