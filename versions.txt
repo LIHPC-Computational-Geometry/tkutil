@@ -1,0 +1,988 @@
+Version 5.13.2 : 25/11/22
+================
+
+Un peu de nettoyage (hors sources).
+Correctif File::create : ajout argument n°2 (O_RDWR | O_CREAT | O_TRUNC). Provoquait un plantage sur Ubuntu 20.
+
+
+Version 5.13.1 : 17/11/22
+================
+
+Correctif File::create : ajout argument n°2 (O_CREAT | O_TRUNC). Provoquait un plantage sur Ubuntu 20.
+
+
+Version 5.13.0 : 18/10/22
+================
+
+La méthode prend en argument le bouléen queued (défaut false). S'il vaut true la tâche n'est ajoutée qu'en file d'attente,
+et aucune tâche n'est éventuellement relancée.
+=> permet de créer toutes les tâches avant de lancer la première en appellant addTack (task, false) puis ThreadManager::instance ( ).join ( ).
+
+
+Version 5.12.1 : 06/04/22
+================
+
+La méthode MachineData::isVirtualMachine repose également sur la commande facter, et supporte l'absence d'une
+des commandes de détection du caractère virtuel de la machine courante.
+
+
+Version 5.12.0 : 05/04/22
+================
+
+Méthode MachineData::isVirtualMachine ( ).
+
+
+Version 5.11.5 : 11/03/22
+================
+
+Correctif constructeur de ReferencedObjectManager : l'instance est construite avec un mutex protecteur en environnement multithread.
+
+
+Version 5.11.4 : 02/03/22
+================
+
+Correctif constructeur de FileLogOutputStream. Le fichier transmis en argument n'était pas ouvert.
+Correctif UTF8String::find : ne lève plus d'exception si pos == length ( ) et en cas de chaine vide.
+
+
+Version 5.11.3 : 25/02/22
+================
+
+Correctif ScriptLogOutputStream::log : suppression de l'appel à logComment qui est effectué par logInstruction juste
+après => les commentaires étaient écrits 2 fois.
+
+
+Version 5.11.2 : 15/02/22
+================
+
+Retouches cmake dans TkUtilScripting : find_dependency.
+
+
+Version 5.11.1 : 09/02/22
+================
+
+Retouches cmake.
+
+
+Version 5.11.0 : 28/01/22
+================
+
+Méthodes File::get/setAccessRights
+Classe ScriptLogOutputStream : aptitude à être créé "exécutables" (flag S_IXUSR).
+Suppression de l'arrêt de génération de Makefiles en l'absence de doxygen (TkUtilScripting/CMakeLists.txt).
+
+
+Version 5.10.2 : 21/01/22
+================
+
+Retouches TkUtilScripting : 
+	- génération via cmake
+	- génération de la documentation via doxygen
+	- support swig 4 avec l'option -doxygen.
+
+
+Version 5.10.1 : 04/11/21
+================
+
+Retouches cmake/python_binding.cmake pour compatibilité Python 2 et 3.
+
+
+Version 5.10.0 : 20/10/21
+================
+
+Méthode LocalNetwork::getNATedEndPoint.
+Méthode NetworkData::isValidInetAddress.
+
+
+Version 5.9.0 : 18/10/21
+===============
+
+Retouches API LocalNetwork (structure LocalNetwork::HPComputer).
+
+Rem : la structure LocalNetwork::HPComputer gagnerait à avoir pour champ supplémentaire un
+champ homeCommand, porteur de la commande (et éventuels arguments) pour connaître le home
+utilisateur. En effet, 'home' n'est pas implémenté partout (ex : Ubuntu 18.0.4), et peut être
+surchargé dans certains environnements.
+
+
+Version 5.8.0 : 13/10/21
+===============
+
+Classe LocalNetwork : informations calculateur fournies par la méthode initialize afin d'être fournies
+par l'application suite, par exemple, à une lecture en configuration.
+
+
+Version 5.7.9 : 07/09/21
+===============
+
+Suppression de mini gros-mots et de balises EXPURGE.
+
+
+Version 5.7.8 : 24/08/21
+===============
+
+Suppression des noms de services et laboratoires.
+
+
+Version 5.7.7 : 04/08/21
+===============
+
+TkUtilScripting/cmake/TkUtilScriptingConfig.cmake.in : find_dependency à Python2 ou Python3 selon le cas.
+
+
+Version 5.7.6 : 28/07/21
+===============
+
+Commentaire sur la conversion UTF16 vers un autre encodage.
+
+
+Version 5.7.5 : 04/02/21 Révisions svn 777/778
+===============
+
+Correctif : LocalNetwork::getUserHome en cas d'ordinateur distant, boucle sur la sortie standard jusqu'à
+obtention d'un path finissant par le nom de l'utilisateur.
+
+
+Version 5.7.4 : 21/12/20 Révisions svn 773/774
+===============
+
+Retouche mineure TkUtil*/CMakeLists.txt
+
+
+Version 5.7.3 : 14/12/20 Révisions svn 771/772
+===============
+
+Retouche mineure CMakeLists.txt racine
+
+
+Version 5.7.2 : 21/10/20 Révisions svn 769/770
+===============
+
+Correctif Color::getNextColor version double (faisait Color::invert ( )).
+
+
+Version 5.7.1 : 16/10/20 Révisions svn 767/768
+===============
+
+Le fichier TkUtilScripting.py généré, au build et à l'installation, a en première ligne une
+déclaration d'encodage utf-8.
+
+
+Version 5.7.0 : 13/10/20 Révisions svn 759/760
+===============
+
+Retouches mineures pour export.
+
+
+Version 5.6.1 : 17/09/20 Révisions svn 754/755
+===============
+
+Retouches mineures passage ISO 8859 -> UTF8.
+
+
+Version 5.6.0 : 02/09/20 Révisions svn 752/753
+===============
+
+v 0.8.0 de cmake/workarounds.cmake (LC_ALL=C)
+v 0.2.0 de cmake/python_binding.cmake (support Python 2/Python 3)
+
+
+Version 5.5.4 : 21/07/20 Révisions svn 748/749
+===============
+
+Correctif -I fourni par TkUtilScriptingTargets.cmake : éviter d'avoir -I.../include/TkUtilScripting.
+
+
+Version 5.5.3 : 15/07/20 Révisions svn 746/747
+===============
+
+- Ajout -DNDEBUG à la compilation en mode non debug.
+- Actualisation des fichiers d'installation par scripting (build.sh, configurations/*).
+
+
+Version 5.5.2 : 08/06/20 Révisions svn 743/744
+===============
+
+Petits correctifs pour import/export.
+
+
+Version 5.5.1 : 08/06/20 Révisions svn 739/740
+===============
+
+Petits correctifs pour import/export.
+cmake/common.cmake : ajout à CMAKE_CXX_FLAGS de la variable EXTRA_CXX_FLAGS éventuellement transmise en argument
+de cmake.
+
+La classe LocalNetwork retrouve son code d'origine. Méthode LocalNetwork::getUserHome à revoir ???
+
+
+Version 5.5.0 : 04/06/20 Révisions svn 734/735
+===============
+
+Fin réintégration en environnement CEA suite confinement covid-19.
+Procédure d'exportation ouverte des sources : cible export avec script export.sh (réalisation d'un tarball filtré,
+sans gros mots, reposant sur la commande expurge réalisée à cet effet et sur la commande tar).
+cmake/workaround.cmake utilise maintenant la commande lsb_release -d à la place du tandem uname/commande locale. A
+finaliser sur calculateur.
+
+
+Version 5.4.0 : 04/04/20
+===============
+
+Fonction File.rename ()
+Déplacement des en-têtes dans le répertoire TkUtil
+=> #include <TkUtil/AnsiEscapesCodes.h> à la place de => #include <AnsiEscapesCodes.h>, ...
+Fichier module/tkutil.module pour l'utilitaire substitute d'actualisation de sources/en-têtes suite à cette modification.
+
+
+Version 5.3.0 : 31/03/20
+===============
+
+LocalNetwork::getUserHome réécrite, traite notamment le cas où la machine demandée n'est pas la machine locale.
+Méthode NetworkData::is ( )
+AnsiEscapeCodes : %d -> %lu
+
+
+Version 5.2.0 : 18/03/20
+===============
+
+Passage du projet en UTF-8
+Portage g++ v 7.5.0
+auto_ptr -> unique_ptr
+
+
+Version 5.1.0 : 18/02/20. Révisions svn 725
+===============
+
+- Retouches compatibilité (SameMinorVersion -> SameMajorVersion)
+
+- TkUtilScripting : génération uniquement de _TkUtilScripting, arrêt de 
+libTkUtilScripting (voir src/TkUtilScripting/CMakeLists.txt pour détails).
+
+
+Version 5.0.3 : 21/01/20. Révisions svn 723
+===============
+
+Script de génération de l'archive des sources, script create_tarball.sh.
+Fichier LISEZMOI.txt
+
+
+Version 5.0.2 : 13/01/20. Révisions svn 722
+===============
+
+Portage CMake/Spack. Retouche python_binding.cmake + dépendance à Python.
+
+
+Version 5.0.1 : 06/01/20. Révisions svn 721
+===============
+
+Portage (Atos_7__x86_64). Retouche workarounds.cmake pour lib stdc++ GNU.
+
+
+Version 5.0.0 : 18/12/19. Révisions svn 718/719
+===============
+
+Portage (CentOS 7) CMake/Spack/Swig v 3.0/g++ 8.3.0/intel 18.0.3.
+
+- Correctif macros INTERNAL_ERROR et INTERNAL_EXCEPTION (problème de propagation
+du jeu UTF).
+
+
+Version 4.6.0 : publiée le 05/09/19. Révisions svn r707/r708
+===============
+
+TK_Variants v 4.8.0
+
+- Classe LocalNetwork.
+- Classe Exception : constructeur prenant en argument libellé + exception
+=> propager toute la chaine d'erreur dans une pile d'appels.
+LocalizedError et InternalError en font de même.
+
+
+Version 4.5.0 : publiée le 29/11/18. Révisions svn r698/r700
+===============
+
+NumericConversions::numberToString réutilise l'implémentation C++
+(-DTOSTR_USES_CPP_IMPLEMENTATION) sauf dans NumericServices (éviter d'utiliser
+les streams c++ dans des variables globales statiques).
+
+Correctif RemoteProcess::kill (plantage).
+
+
+Version 4.4.1 : publiée le 26/11/18. Révisions svn r682/r682
+===============
+
+Correctif dans NumericConversions::toStr (double d) (patch de la version 4.3.1).
+
+
+Version 4.4.0 : publiée le 21/11/18. Révisions svn r672/r673
+===============
+
+Classes AnsiEscapeCodes, TermAutoStyle et TermCursorPos.
+Classe ArgumentsMap.
+
+Utilisation par la classe OstreamLogOutputStream (méthodes enableColorization).
+
+Process : correctif de bogue dans childDeath, handler sur signal, où il ne
+fait pas bon d'utiliser malloc/free.
+=> Le message d'erreur des instances de Process est pré-alloué
+=> Les instances non attendues de Process ne sont plus détruites.
+
+
+Version 4.3.1 : publiée le 23/11/18. Révisions svn r679/r681
+===============
+
+Correctif NumericConversions::toStr (double) en API C.
+
+
+Version 4.3.0 : publiée le 14/09/18. Révisions svn r665/r667
+===============
+
+Classe ConsoleOutput :
+- UTF-8 par défaut.
+- ConsoleOutput::cout et cerr.
+- Nombreuses classes : utilisation de ConsoleOutput en remplacement de std::cout
+et std::cerr.
+
+
+Version 4.2.1 : publiée le 13/09/18. Révisions svn r652/r654
+===============
+
+Suite à des problèmes avec un code (mailleur 2D) sur station
+CentOS7/g++ 6.4/libstdc++.so.6/-D_GLIBCXX_USE_CXX11_ABI=0
+(jardinage inexpliqué dans la libstdc++, première erreur relevée par
+valgrind 3.13.0 --tool=memcheck), la partie numberToString de
+NumericConversions est recodée en C. L'ancien code est conservé et
+utilisable via la directive de compilation -DTOSTR_USES_CPP_IMPLEMENTATION.
+
+
+Version 4.2.0 : publiée le 10/09/18. Révisions svn r648/r650
+===============
+
+Classe ConsoleOutput encapsulant les flux standards, type cout et cerr, avec
+gestion de l'encodage lors des opérations d'injection.
+
+Méthodes Charset::str2charset et charset2str.
+ScriptLogOutputStream::write : les sauts de lignes dans le flux ne sont plus
+faits à l'aide de endl (mal gérés) mais à partir d'un \n intégré à la chaine
+convertie dans le jeu de caractères demandé avant écriture.
+
+Scenario de déploiement modifié pour les liens vers TkUtilScripting.
+
+
+Version 4.1.0 : publiée le 22/06/18. Révisions svn r607/r609
+===============
+
+Redéployé le 26/06/18 : retour aux liens initiaux pour le binding python.
+
+- Classe UTF8String : nouveaux services de gestion des caractères non ASCII :
+asCharset, replace, charNum, charAt, convertedToAscii, utf8CharSize,
+replaceUtf8Char, replaceSpecialCharacters.
+
+- UTF8String::operator << (ostream& os, const UTF8String& str) : envoie utf8 ( )
+dans le flux (au lieu de iso ( )).
+
+
+Version 4.0.0 : publiée le 12/04/18
+===============
+
+Redéployée le 12/04/18 : retouches flux de logs.
+Redéployée le 10/04/18 : évolutions classe Locale.
+Redéployée le 09/04/18 : patch du 09/04/18 dans ThreadPool::barrier :
+éviter que tous les threads n'attendent !
+
+Déployé le 29/03/18.
+
+Pas de version 3.4.0 de déployée, passage directement à la version 4.0.0.
+Révision 572 à 585.
+
+TK_Variants v 3.2.0
+
+src/gscc_prj.xml :
+- Retouche du lien créé TkUtilScripting-{version}
+- Déploiement CPP_et_Systemes_Etendu
+
+Module TkUtil :
+- Classe ThreadPool et son test src/tests/thread_pool.cpp.
+- Classe UTF8String qui a vocation à remplacer la classe UnicodeString
+=> Remplacement des UnicodeString par des UTF8String.
+- Classe Charset (détection de jeu de caractères dans lequel est
+encodé un fichier source) et son test src/encoding.
+- MachineData : l'instance unique est allouée dynamiquement.
+- Log et flux de logs : utilisation des UTF8String, possibilité de choisir le
+jeu de caractères utilisé dans les flux.
+- Classe Locale : petit correctif des méthodes isIsoCharset et getCodeset.
+Méthode Locale::detectCharset.
+- ScriptLogOutputStream : le caractère encoding remplacé par le jeu de
+caractères des LogOutputStream.
+- ScriptLogOutputStream::write prend en argument un UTF8String,
+ScriptLogOutputStream::formatComment retourne un UTF8String.
+
+
+Version 3.3.0 :
+===============
+
+TK_Variants v 3.0.0 (ECM_Variants v 1.21.0 : portage RH 7, compilateurs gcc 6.2.0, icpc 17.0.4).
+
+src/gscc_prj.xml :
+- suppression condition Dyn pour la composante TkUtilScripting.  Semble OK.
+- au déploiement la composante run est maintenant dans le scenario officiel.
+Semble ne pas fonctionner en incrémental.
+
+- RemoteProcess::kill : appelle Process::kill pour tuer le lanceur.
+
+
+Version 3.2.0 : 21/07/17
+===============
+
+TK_Variants v 2.15.0
+
+- File :
+	- Correctif méthode isDirectory.
+	- Méthodes isRegularFile, isFifo, isSocket.
+
+- tests/removefile.cpp
+- src/socket_proxy : proxy socket entre deux machines n'ayant pas de visibilité
+l'une sur l'autre (ex : station, noeud partition parallèle).
+Testé avec une application client/serveur Qt/VTK simple (VTK_CS_MPI_Socket), le
+serveur MPI/VTK calculant sur partition parallèle la vue graphique, cette vue
+étant remontée via socket à l'IHM Qt dotée d'une vtkRenderWindow, et les
+interactions (simples) étant acheminées au serveur par le même canal socket.
+Modifications de la vue/retour de l'image à afficher fluide (pour ce cas simple,
+mais ça montre que ça n'est pas le facteur limitant). Exemple d'utilisation 
+dans src/socket_proxy/socket_proxy.cpp.
+Test également en mode C/S avec tunneling SSH et redirection de socket dans un
+fichier UNIX (socket BSD) côté client :
+serveur (partition parallèle <- socket TCP/IP -> proxy (partition de login) à l'écoute dans socket UNIX <- SSH avec redirection dans socket UNIX côté client <-- client : c'est également fluide.
+- src/socket_proxy_test
+
+
+Version 3.1.0 : 15/03/17
+===============
+
+TK_Variants v 2.7.0
+
+Arrêt annulation de threads via API thread Posix, incompatible avec le langage
+C++.
+
+
+Version 3.0.1 : 16/12/16
+===============
+
+TK_Variants v 2.2.0
+
+Correctif dans Process::getPath. Le parseur s'arrêtait sur la séquence ::
+dans le PATH et ne testait donc pas les répertoires suivants.
+
+Suppression variable STDENV_PATH_LOG du script TkUtilLauncher.
+
+
+Version 3.0.0 : 09/12/16
+===============
+
+TK_Variants v 2.0.0
+
+Arrêt variant MT
+
+- Méthode Timer::strDuration
+- NumericConversions::shortestRepresentation : petit correctif :
+shortestRepresentation (98.00085, 6, 3) -> 98.00085 et non plus 9.800085e-1)
+
+
+Version 2.43.0 : 29/08/16 Révisions 736/737
+================
+
+- MachineData::isRemoteHost : Méthode pouvant être utilisée pour prévenir le
+lancement d'applications X/GL sur des machines autres que celle de login
+(risque de plantage de station en cas d'incompatibilité.
+
+- Timer : fonction microduration qui mesure le temps en microsecondes.
+
+- Correctif NumericConversions::shortestRepresentation : erreur d'exposant dans
+certains cas.
+Exécutable test tests/user_representation.cpp
+
+
+Version 2.42.0 : 15/03/16 
+================
+
+- TK_Variants v 1.66.0
+- Méthode NumericConversions::shortestRepresentation.
+
+
+Version 2.41.0 : 04/01/16 
+================
+
+- TK_Variants-1.57.0 (Migration tera 1000, uniquement Python_2.7 et
+swig_1.3.40, arrêt RH6/icc 14).
+
+
+Version 2.40.0 : 23/10/15 
+================
+
+- TK_Variants-1.54.0
+
+- Déploiement Python 2.6 et 2.7 sur RH6.
+
+
+Version 2.39.0 : 23/10/15 
+================
+
+- TK_Variants-1.54.0
+
+- Déploiement Python 2.6 et 2.7 sur RH6.
+
+
+Version 2.38.0 : 12/10/15 
+================
+
+- TK_Variants-1.53.0
+
+- Notion de formatage dans les logs de type Script.
+- Script TkUtilLauncher : déploiement OK lors du déploiement de la cible
+deployExes.
+
+
+Version 2.37.0 : 06/07/15 
+================
+
+- TK_Variants-1.52.0 (=> Atos_7__x86_64, ...)
+
+- Portage Atos_7__x86_64/icpc 15/gcc 4.7/Python 2.7
+
+- NumericServices::*MachEpsilon, NumericServices::*MachMin,
+NumericServices::*MachMax, NumericServices::*MachInfinity deviennent des
+fonctions membres. TkUtil était initialisé avant std::numeric_limits<>, ce
+qui fait que le contenu de ces variables était nul ...
+
+
+Version 2.36.0 : 06/05/15 
+================
+
+- MachineData : Précisions sur les chiffres significatifs garantis des réels.
+=> Les chiffres significatifs concernent la mantisse complète, donc tous les
+m de m.mmmmm e+-x, ou mmm.mmmmm e+-x.
+- UserData : #include <unistd.h> pour uid_t pour cible Atos_7__x86_64.
+
+- TK_variants v 1.48.0.
+- Correctifs suite passage sous coverity.
+
+- Méthodes Color::invert et Color::getNextColor (Color, double, double,
+  double).
+- Méthodes Color::isValid et Color::setValid.
+- Evolution UrlFifo::add : l'URL ajoutée est déplacée en tête ou fin de liste
+si elle est déjà recensée.
+
+
+Version 2.35.0 : 28/11/14 
+================
+
+- TK_Variants v 1.43.0.
+- Classe Color : hsv, getNextColor, rgbNear, ...
+
+
+Version 2.34.0 : 17/12/13 
+================
+
+- TK_Variants v 1.33.0.
+- LogOutputStream (et classes dérivées) : méthodes
+  enableThreadID/displayThreadID.
+- Portage clang 3.3
+Correctif appel pthread_cleanup_push dans ReferencedObject::removeObserver.
+
+
+Version 2.33.0 : 15/10/13
+================
+
+Republié le 18/10/13, avec Numeric -> NumericServices car entrait en collision
+avec d'autres bibliothèques.
+
+- TK_Variants 1.31.0.
+- Classe Numeric.
+- NumericConversions :
+	- Méthode userRepresentation
+	- Utilisation de ostringstream à la place de ostrstream (corrigerait une
+	  fuite mémoire dépistée par valgrind 3.8.1).
+	- Support du type long double.
+- UnicodeString gère le type long double.
+- tests/conversions.cpp
+- ScriptingLog::addMethodArgument (double) utilise
+NumericConversions::userRepresentation.
+
+
+Version 2.32.0 : 30/05/13
+================
+
+- NetworkData : efforts faits pour mettre en cache un max d'infos afin de
+solliciter le moins possible le système.
+=> API (interne) de la classe fortement retouchée, avec notamment utilisation
+d'une instance de classe via getLocalHost qui est également partagée avec la
+classe MachineData.
+- TK_Variants 1.27.0.
+
+
+Version 2.31.0 : 13/05/13
+================
+
+- Evolutions classe Mutex :
+	- Mutex non récursifs,
+	- Méthode tryLock.
+- Variant Python_System à la place de Python_2.6.
+- TK_Variants 1.26.0.
+
+
+Version 2.30.0 : 18/01/13
+================
+
+Variants PYTHON_LIB_VERSION et SWIG_COMPILER_VERSION pour TkUtilScripting.
+Déploiement avec les variants Swig_1.3/Python_2.4 et Swig_2.0/Python_2.6.
+
+
+Version 2.29.0 : 12/11/12
+================
+
+Modification de src/gscc_prj.prj concernant les liens tirés lors d'un
+déploiement pour la partie scripting (dans le répertoire binding), faire en
+sorte que les liens soient depuis ".".
+
+- Classe Mutex : suppression du couple pthread_cleanup_push/pthread_cleanup_pop
+des macros THREAD_SAFE_AUTO_MUTEX_BEGIN/THREAD_SAFE_AUTO_MUTEX_END. Ces macros
+seraient à l'origine de plantages, sans preuve formelle.
+
+- Classe DuplicatedStream, comparable à FileRedirection.
+Permet de récupérer stdout ou stderr, de le récupérer temporairement (copie
+dans
+un fichier) tout en continuant de le diriger dans la sortie initiale
+(ex : /dev/tty), ce qui revient à rediriger dans la sortie initiale.
+ATTENTION : la redirection dans le flux initial n'est pas efficace à 100/100.
+
+
+Version 2.28.0 : 17/01/12
+================
+
+Déploiement hors TK_Variants.
+
+- Optimisation de la classe FileRedirection. Lors de gros flux à rediriger
+l'utilisation de stream.getline (buffer, 10000) est pénalisant
+=> remplacement par stream.read (buffer, 10000).
+
+
+Version 2.27.0 : 04/01/12
+================
+
+Déploiement hors TK_Variants.
+
+Protection contre les (dé)chargements multiples de la bibliothèque :
+- Lorsque plusieures instances de cette bibliothèques sont chargées, la variable
+globale MachineData::_currentMachine est instaciée une unique fois, mais son
+destructeur est appelé 2 fois, ce qui provoque le plantage du logiciel avec
+affichage du message suivant :
+*** glibc detected *** ...Magix3D: corrupted double-linked list:  *** 
+Le problème vient a priori du chargement multiple de la bibliothèque (édition
+des liens). Cette version affiche sur cout des messages d'alerte en cas de
+détection de (dé)chargement multiple.
+- TkUtilScripting utilise TkUtil, ne l'incorpore plus.
+
+
+Version 2.26.0 : 24/11/11
+================
+
+- TK_Variants 1.20.0
+
+- NetworkData :
+	- Méthode getInetAddress (const string& network).
+	- Méthode getUsableInetAddress (const string& network).
+	- getInetAddress retourne, si possible, autre chose que 127.0.0.1.
+- Méthode Process::getCommandLine ( ).
+
+
+Version 2.25.1 : 12/09/11.
+================
+
+- Correction de bogue dans tkutil_launcher : réactivation de l'invocation de
+process->wait ( ).
+=> Sur certaines plates-formes process->getCompletionCode ( ) était invoqué
+alors que le processus n'était pas terminé. Il y avait de ce fait un retour en
+erreur.
+- Remarque : ce correctif n'impacte que l'outil TkUtilLauncher, mais pas l'API
+ou même les binaires de la bibliothèque TkUtil.
+
+
+Version 2.25.0 : 08/09/11.
+================
+
+- TK_Variants v 1.19.0.
+- ECM_Variants v 1.8.0.
+
+
+Version 2.24.0 : 22/03/11 (pré-version).
+================
+
+PRE-VERSION 2.24.0 PUBLIEE DANS produits_tests POUR TESTS.
+
+- TK_Variants v 1.18.0.
+- Mutex : macros (UNCANCELABLE_)THREAD_SAFE_AUTO_MUTEX_*.
+S'assurer que le mutex est déverrouillé, y compris en cas
+d'annulation de thread.
+- Log*Stream et Dispatcher : utilisation des macros
+THREAD_SAFE_AUTO_MUTEX_ en vue de ne pas être perturbé par une
+annulation de thread.
+- ReferencedObject et classes dérivées : remplacement des
+getMutex ( )->(un)lock ( ) par AutoMutex dans (UN/)LOCK_OBJECT_BASE.
+- ReferencedObject et dérivées : méthode emergencyCleanup. Evènement
+UTIL_UNAVAILABLE_EVENT.
+- Process, RemoteProcess, tkutil_launcher : suppression de quelques
+cout laissés par erreur.
+
+
+Version 2.23.0 : 16/03/11.
+================
+
+- ECM_Variants v 1.7.0, TK_Variants v 1.17.0 (BullEL_6_AE__x86_64).
+- NetworkData : méthode getUsableInetAddress.
+- TkUtilScripting devient du type shlib. Le binaire généré avec le variant
+StaticLib était vide car swig n'est utilisé qu'avec le variant Dyn.
+- DetachedThread::startTask n'appelle plus pthread_detach.
+- ThreadIfc : énuméré CANCEL_POLICY, méthodes set/getCancelPolicy.
+Retouches test d'annulation de threads.
+- JoinableThread::join ne détruit plus l'instance.
+- Mutex : méthode safeUnlock.
+
+
+Version 2.22.0 : 25/01/11
+================
+
+Rem : les exécutables tkutil_launcher ont été remplacés à la main le 10/06/11
+par les mêmes exécutables recompilés mais avec l'affichage sur cout des options
+commentés dans Process::execute.
+
+- TK_Variants v 1.16.0.
+- Correctif de bogue dans ThreadIfc::getId : l'identifiant retourné pouvait être
+celui du thread courrant et non celui de l'instance interrogée.
+- Méthode ThreadIfc::cancel et assimilées. Création d'un test 
+(src/tests/canceled_threads.cpp).
+- Classe UncancelableAutoMutex.
+- Méthode abstraite Log::clone, implémentation dans les classes dérivées.
+
+
+Version 2.21.0 : 07/10/10
+================
+
+- Classe UrlFifo dans l'espace de nommage TkUtil.
+- *Process*.cpp : implémentation des classes Process et RemoteProcess dans
+l'espace de nommage TkUtil.
+- Process::childDeath : n'appelle plus fillChildBuffer, c'est fait depuis
+getChildLine si le processus est terminé => évite des dead locks dus à des
+appels à la libmalloc dans la pile (fonction en cours + allocations dues à
+fillChildBuffer dans childDeath).
+
+
+Version 2.20.0 : 30/08/10
+================
+
+- ScriptLogOutputStream : correctif de bogue dans recordFileVariable 
+(exceptions de type char* levée au lieu de Exception).
+- Classe UrlFifo.
+- #include "*.h" remplacés par #include <*.h>.
+- TK_Variants v 1.9.0.
+
+
+Version 2.19.1 : 04/06/10
+================
+
+Le 02/07/10 : dépend de pthread en toutes circonstances. Ecrasement de
+la version précédante. Portage Fedora_12__x86_64.
+
+- Process : retouches dans wait, childDeath et execute, problemes de
+transmission complete de stdout de fils vers pere.
+Probleme solutionne ??? Les tests ne sont pas toujours reproductibles (charge
+machine, serveur NFS, ... ???). Ne semble pas completement solutionne.
+Difficultes de debogage avec totalview et purify sur station en utilisant
+le test de QtNetwork (Qt 3.3.6) : purify refuse d'executer le process,
+totalview semble se perdre dans le code ...
+NB : le bogue (attente qu'un mutex soit deverouille au niveau de la classe
+string?) survient dans le selecteur de fichier "reseau" apres de multiples
+raffraichissements.
+
+- tkutil_launcher : profite des ammeliorations de Process.
+Option -pipeDelay (inutilisee dans un premier temps).
+
+- TK_Variants v 1.7.1
+
+
+Version 2.19.0 : 25/05/10
+================
+
+- Script TkUtilLauncher : suppression de l'option --silent.
+- Creation du module TkUtilScripting, binding (python) du module TkUtil.
+Le module TkUtil ne repose plus du tout sur python.
+- Lien glissant binding/TkUtilScripting-2.19.0-st et
+binding/TkUtilScripting-2.19.0-mt vers les binaires par defaut lors du
+deploiement.
+
+
+Version 2.18.0 : 11/12/09
+================
+
+Le 17/02/10 :
+- Modification du script TkUtilLauncher par ajout de l'option --silent de
+gscc_run (cf. version 2.19.0).
+
+Le 18/01/10 : redeploiement avec ecrasement de la version 2.18.0.
+- Correctifs dans NetworkData pour compatibilite avec tera 1000
+(acces aux noeuds des calculateurs via leur nom de machine "qualifie" (nom de
+machine, numero de noeud, nom de domaine incluant le reseau utilise).
+- tkutil_launcher affiche le nom qualifie de la machine hote.
+
+Le 14/01/10 : redeploiement avec ecrasement de la version 2.18.0 initiale :
+- Correctif de bogue dans UnicodeString::find : la derniere position possible
+n'etait pas evaluee.
+
+Version 2.18.0 d'origine :
+- ECM_Variants / TK_Variants 1.2.0
+- Actualisation de la documentation.
+
+
+Version 2.17.0 : 29/10/09
+================
+
+Le 27/11/09 : redeploiement executable + script suite a modification dans
+	src/gscc_prj.xml.
+
+Le 25/11/09 : deploiement de l'executable launcher.
+	- launcher renomme en tkutil_launcher
+	- creation du script TkUtilLauncher
+
+Le 23/11/09 : force a la main dans l'espace de distribution, et ajoute aux
+sources :
+	- ParallelTasksDispatcher.h : inclue algorithm (portage Fedora).
+	- LogOutputStream : LOCK_LOG_STREAM precise que le mutex est de l'espace de
+	nommage TkUtil (la classe AutoMutex existe dans une autre bibliotheque
+	maison ...).
+
+Modifications initiales de la version 2.17.0 :
+- Portage Fedora_11__x86_64, arret RH 5 32 bits et +-Nehalem.
+- Utilisation de ECM_variants.xml/TK_Variants.xml (variants systeme
+d'exploitation/compilateurs utilises).
+
+
+Version 2.16.0 : 14/09/09
+================
+
+06/10/09 : deploiement sur plate-forme RHEL_4__x86_64.
+
+Portage sous GSCC (0.12.1).
+Renommage en TkUtil de icetkutil pour compatibilite avec GSCC (lors du
+deploiement gscc recherche icetkutil.pyc).
+
+
+Version 2.15.0 : 06/09/09
+================
+
+- NumericConversions : correction de bogues dans strToX (les chaines vides
+etaient considerees comme valides).
+
+Rem : publication en tant que nouvelle version (2.15.0 et non 2.14.1) car une
+version release entrainerait la perte de la tracabilite pour les logiciels
+utilisant la version dynamique. De meme, les consequences de la livraison sous
+forme de bibliotheque dynamique sont difficilement maitrisables.
+
+
+Version 2.14.0 : 09/04/09
+================
+
+- ScriptingLog : les couples balises valeurs peuvent prendre des parametres
+complementaires => classe TaggedAttribute.
+
+
+Version 2.13.0 : 23/03/09
+================
+
+- ScriptingLog : balises associées aux logs de type scripting (getTags, addTag).
+- ScriptLogOutputStream : support des balises.
+- Classe ScriptingTools : utilitaires de gestion des scripts avec balises.
+- Executable fileExtractor : extraction de fichiers contenus sous forme de
+lignes commentees dans des scripts.
+
+
+Version 2.12.0 : 28/01/09
+================
+
+- Classe PaintAttribute.
+- Version.h : _VERSION_H -> VERSION_H pour mettre fin a un conflit avec
+Version.h d'une autre bibliotheque.
+
+
+Version 2.11.2 : 18/12/08
+================
+
+FileRedirection::getText : correction de bogue (taille de buffer).
+
+
+Version 2.11.1 : 10/10/08
+================
+
+NumericConversions::strToULong et strToULongLong levent une exception si la
+chaine a convertir commence par le signe moins (non fait par strtoul et
+strtoull).
+
+
+Version 2.11.0 : 03/10/08
+================
+
+ScriptLogOutputStream : support de l'encodage des scripts.
+
+Ajout a la base subversion des fichiers lies au scripting (repertoire swig,
+ScriptingLog, ScriptLogOutputStream).
+
+
+Version 2.10.0 : 24/07/08
+================
+
+- MachineData::floatSignificantNumeral et doubleSignificantNumeral.
+- ScriptingLog::addMethodArgument (double) utilise 
+MachineData::doubleSignificantNumeral ( ).
+- NumericConversions : support des entiers long (non signes) double precision.
+- UnicodeString : support des entiers long (non signes) double precision.
+
+
+Version 2.9.0 : 23/06/08
+===============
+
+- FileLogOutputStream : methodes getFileStream et addBlankLine
+- Classe ScriptLogOutputStream
+- Evolutions de la classe ScriptingLog
+- Classe Process : methodes initialize (argc, argv, envp),
+getCurrentExecutable, setCurrentSoftware, getCurrentSoftware,
+getCurrentSoftwareVersion.
+- Classe ReferencedObjectManager
+- Classe ReferencedNamedObject : methodes getUniqueName/setUniqueName.
+- NumericConversions : nouvelles fonctions toStr de conversions de reels dont
+on peut preciser le nombre de caracteres de la chaine finale.
+Utilisation par l'operateur <<.
+- UnicodeString : utilise les nouveaux services de NumericConversions.
+- ReferencedObject::notifyObserversForModification : travail sur une copie de
+la liste des observateurs afin de permettre a l'un d'entre-eux de s'enlever de
+la liste dans sa fonction observableModified sans provoquer de plantage.
+
+
+Version 2.8.2 : 15/05/08
+===============
+
+- ReferencedObject : les classes utilisent des multimap a la place des maps.
+- Log.h : type SCRIPTING
+- Classe ScriptingLog
+
+
+Version 2.8.1 : 07/03/08
+===============
+
+- File::createTemporaryName : utilisation différente des valeurs en retour de
+mktemp suite à des problèmes de portage sur RHEL_5__x86_64.
+- ObjectBase::getObservableCount et ObjectBase::getObservables
+
+
+Versions antérieures :
+======================
+
+Voir fichier versions.old.
