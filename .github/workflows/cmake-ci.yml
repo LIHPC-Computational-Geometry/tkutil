@@ -13,3 +13,4 @@ jobs:
     uses: LIHPC-Computational-Geometry/lihpccg-ci/.github/workflows/cmake-reusable.yml@main
     with:
       run-tests: false
+      cmake-options: "-DUSE_PYTHON_3:BOOL=ON"
