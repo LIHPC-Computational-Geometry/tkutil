@@ -1,0 +1,12 @@
+{
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "ci",
+        "cacheVariables": {
+           "USE_PYTHON_3:BOOL": "ON"
+        }
+      }
+    ]
+}
+  
