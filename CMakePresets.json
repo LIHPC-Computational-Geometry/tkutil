@@ -4,7 +4,7 @@
       {
         "name": "ci",
         "cacheVariables": {
-           "USE_PYTHON_3:BOOL": "ON"
+           "USE_PYTHON_3": "ON"
         }
       }
     ]
