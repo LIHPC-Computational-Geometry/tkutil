@@ -3,7 +3,8 @@
     "configurePresets": [
       {
         "name": "ci",
-        "cacheVariables": {
+        "cacheVariables":
+        {
            "USE_PYTHON_3": "ON"
         }
       }
