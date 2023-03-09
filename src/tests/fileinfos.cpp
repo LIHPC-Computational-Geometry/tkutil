@@ -14,7 +14,7 @@ int main (int argc, char* argv [])
 	if (1 == argc)
 	{
 		cout << "Syntax : " << argv [0] << " file1 file2 ... filen" << endl;
-		return 0;
+		return -1;
 	}	// if (1 == argc)
 
 	for (int i = 1; i < argc; i++)
@@ -23,12 +23,10 @@ int main (int argc, char* argv [])
 		{
 			File	file (argv [i]);
 
-			cout 
-			<< "=============================================================="
+			cout << "=============================================================="
 			     << endl;
 			cout << file;
-			cout 
-			<< "=============================================================="
+			cout << "=============================================================="
 			     << endl;
 		}
 		catch (const Exception& exc)

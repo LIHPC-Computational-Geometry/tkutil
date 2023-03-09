@@ -17,7 +17,7 @@ int main (int argc, char* argv [])
 	{
 		cout << "Syntax : " << argv [0] << " file1" << endl;
 		cout << "Removes given file or directory." << endl;
-		return 0;
+		return -1;
 	}	// if (1 == argc)
 
 	try

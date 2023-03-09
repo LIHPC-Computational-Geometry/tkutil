@@ -11,7 +11,9 @@ using namespace TkUtil;
 static void A (bool stdexc)
 {
 	if (true == stdexc)
-	throw runtime_error ("Runtime error in A ( ).");
+	{
+		throw runtime_error ("Runtime error in A ( ).");
+	}
 
 	throw Exception ("Error during A ( ) call.");
 }	// A
@@ -62,7 +64,7 @@ static void D (bool stdexc)
 }	// D ( )
 
 
-void checkAndReport (bool stdexc)
+int checkAndReport (bool stdexc)
 {
 	cout << AnsiEscapeCodes::blueFg;
 	try
@@ -72,6 +74,7 @@ void checkAndReport (bool stdexc)
 		D (stdexc);
 		cout << "Absence d'erreur lors de la levée d'exception "
 		     << "=> il y a probablement eu un problème !!!" << endl;
+		return -1;
 	}
 	catch (const Exception& exc)
 	{
@@ -83,6 +86,7 @@ void checkAndReport (bool stdexc)
 		cerr << AnsiEscapeCodes::redFg << "Erreur non documentée." << endl;
 	}
 	cout << AnsiEscapeCodes::reset;
+	return 0;
 }	// checkAndReport
 
 
@@ -90,9 +94,18 @@ int main (int argc, char* argv[])
 {
 	cout << "Exécution du programme " << argv [0]
 	     << " : deux erreurs doivent survenir ..." << endl;
-	checkAndReport (true);
-	checkAndReport (false);
-	cout << "Fin normale du programme " << argv [0] << endl;
+	int rc = checkAndReport (true);
+	if (rc == -1)
+	{
+		return -1;
+	}
 
+	rc = checkAndReport (false);
+	if (rc == -1)
+	{
+		return -1;
+	}
+
+	cout << "Fin normale du programme " << argv [0] << endl;
 	return 0;
 }	// main

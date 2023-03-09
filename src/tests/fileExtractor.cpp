@@ -83,10 +83,12 @@ int main (int argc, char* argv [])
 	catch (const Exception& exc)
 	{
 		cout << endl << "Erreur : " << exc.getFullMessage ( ) << endl;
+		return -1;
 	}
 	catch (...)
 	{
 		cout << endl << "Erreur non documentée." << endl;
+		return -1;
 	}
 
 	return 0;

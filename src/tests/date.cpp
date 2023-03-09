@@ -1,4 +1,5 @@
 #include "TkUtil/Date.h"
+#include "TkUtil/Exception.h"
 
 #include <iostream>
 
@@ -12,9 +13,26 @@ static void display (const Date& date);
 
 int main (int argc, char* argv [])
 {
-	Date	current;
-
-	display (current);
+	try
+	{
+		Date	current;
+		display (current);
+	}
+	catch (const Exception& exc)
+	{
+		cout << "Exception caught : " << exc.getFullMessage ( ) << endl;
+		return -1;
+	}
+	catch (const exception& e)
+	{
+		cout << "Standard exception caught : " << e.what ( ) << endl;
+		return -1;
+	}
+	catch (...)
+	{
+		cout << "Undocumented exception caught." << endl;
+		return -1;
+	}		
 
 	return 0;
 }	// main

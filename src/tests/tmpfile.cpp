@@ -15,11 +15,12 @@ static const Charset	charset ("àéèùô");
 
 int main (int argc, char* argv [])
 {
-	if (3 != argc)
+	cout << argc << endl;
+	if (3 != argc && 4 != argc)
 	{
-		cout << "Syntax : " << argv [0] << " tmpDirPrefix filePrefix" << endl;
-		return 0;
-	}	// if (3 != argc)
+		cout << "Syntax : " << argv [0] << " tmpDirPrefix filePrefix [-r remove file without keystroke]" << endl;
+		return -1;
+	}	// if (3 != argc || 4 != argc)
 
 	try
 	{
@@ -47,12 +48,14 @@ int main (int argc, char* argv [])
 		ofs << "Ceci est un test." << endl;
 		ofs.close ( );
 
-		cout << "Enter a key in order to remove temporary file and directory."
-		     << endl;
-		char	c;
-		cin >> c;
+		if (argc == 3) { 
+			cout << "Enter a key in order to remove temporary file and directory."
+				<< endl;
+			char	c;
+			cin >> c;
+		}
 		cout << "Directory " << tmpDir.getFullFileName ( ) << " and file "
-		     << tmpFile.getFullFileName ( ) << " will be removed.";
+		     << tmpFile.getFullFileName ( ) << " will be removed." << endl;
 	}
 	catch (const Exception& exc)
 	{

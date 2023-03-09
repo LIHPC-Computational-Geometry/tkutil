@@ -6,3 +6,4 @@ add_subdirectory (encoding)
 add_subdirectory (socket_proxy)
 add_subdirectory (socket_proxy_test)
 
+enable_testing()

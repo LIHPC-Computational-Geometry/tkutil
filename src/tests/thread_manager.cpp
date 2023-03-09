@@ -112,57 +112,57 @@ int main (int argc, char* argv[])
 {
 	try
 	{
+		const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
 
-	const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
+		cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
+			<< nbProcs << " processors." << endl;
 
-	cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
-	     << nbProcs << " processors." << endl;
+		ThreadManager::initialize ( );
 
-	ThreadManager::initialize ( );
+	//	vector <JoinableThread*>	tasks;
+		size_t						i	= 0;
+		const size_t				max	= 10;
+		Writer						writer (stdout);
+		cout << "Creation of " << (unsigned long)max
+			<< " joinable writing tasks without mutex ..." << endl;
+		for (i = 0; i < max; i++)
+			ThreadManager::instance ( ).addTask (new WriterThread (max, writer, i));
+		cout << "Joining tasks ..." << endl;
+		ThreadManager::instance ( ).join ( );
+		cout << "Joinable writing tasks without mutex completed." << endl;
+		cout << endl << endl;
 
-//	vector <JoinableThread*>	tasks;
-	size_t						i	= 0;
-	const size_t				max	= 10;
-	Writer						writer (stdout);
-	cout << "Creation of " << (unsigned long)max
-	     << " joinable writing tasks without mutex ..." << endl;
-	for (i = 0; i < max; i++)
-		ThreadManager::instance ( ).addTask (new WriterThread (max, writer, i));
-	cout << "Joining tasks ..." << endl;
-	ThreadManager::instance ( ).join ( );
-	cout << "Joinable writing tasks without mutex completed." << endl;
-	cout << endl << endl;
+		ProtectedWriter			pwriter (stdout);
+		cout << "Creation of " << (unsigned long)max
+			<< " joinable writing tasks with mutexes ..." << endl;
+		for (i = 0; i < max; i++)
+			ThreadManager::instance ( ).addTask (new WriterThread(max, pwriter, i));
+		cout << "Joining tasks ..." << endl;
+		ThreadManager::instance ( ).join ( );
+		cout << "Joinable writing tasks with mutexes completed." << endl;
+		cout << endl << endl;
 
-	ProtectedWriter			pwriter (stdout);
-	cout << "Creation of " << (unsigned long)max
-	     << " joinable writing tasks with mutexes ..." << endl;
-	for (i = 0; i < max; i++)
-		ThreadManager::instance ( ).addTask (new WriterThread(max, pwriter, i));
-	cout << "Joining tasks ..." << endl;
-	ThreadManager::instance ( ).join ( );
-	cout << "Joinable writing tasks with mutexes completed." << endl;
-	cout << endl << endl;
+		cout << "Creation of " << (unsigned long)max
+			<< " joinable writing tasks with mutexes and concurrency flag ..."
+			<< endl;
+		for (i = 0; i < max; i++)
+			ThreadManager::instance ( ).addTask (
+				new WriterThread (max, pwriter, i, i % 2));
+		cout << "Joining tasks ..." << endl;
+		ThreadManager::instance ( ).join ( );
+		cout << "Joinable writing tasks with mutexes and concurrency flag completed." << endl;
 
-	cout << "Creation of " << (unsigned long)max
-	     << " joinable writing tasks with mutexes and concurrency flag ..."
-	     << endl;
-	for (i = 0; i < max; i++)
-		ThreadManager::instance ( ).addTask (
-			new WriterThread (max, pwriter, i, i % 2));
-	cout << "Joining tasks ..." << endl;
-	ThreadManager::instance ( ).join ( );
-	cout << "Joinable writing tasks with mutexes and concurrency flag completed." << endl;
-
-	ThreadManager::finalize ( );
-
+		ThreadManager::finalize ( );
 	}
 	catch (const Exception& exc)
 	{
 		cout << "Exception caught : " << exc.getFullMessage ( ) << endl;
+		return -1;
 	}
 	catch (...)
 	{
 		cout << "Unexpected error caught." << endl;
+		return -1;
 	}
 
 	return 0;

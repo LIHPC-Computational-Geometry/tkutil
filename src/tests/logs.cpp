@@ -109,11 +109,13 @@ int main (int argc, char* argv [])
 			ErrorLog	error (exc);
 			dispatcher << error;
 			delete file;
+			return -1;
 		}
 		catch (const std::exception& e)
 		{
 			ErrorLog	error (e);
 			dispatcher << error;
+			return -1;
 		}
 		catch (...)
 		{
@@ -123,6 +125,7 @@ int main (int argc, char* argv [])
 			ErrorLog	error (errorMsg);
 			dispatcher << error;
 			delete file;
+			return -1;
 		}
 	}	// for (int i = 1; i < argc; i++)
 
@@ -157,11 +160,13 @@ int main (int argc, char* argv [])
 	{
 		ErrorLog	error (exc);
 		dispatcher << error;
+		return -1;
 	}
 	catch (const std::exception& e)
 	{
 		ErrorLog	error (e);
 		dispatcher << error;
+		return -1;
 	}
 	catch (...)
 	{
@@ -169,6 +174,7 @@ int main (int argc, char* argv [])
 		errorMsg << "Erreur non renseignée lors l'écriture d'un log.";
 		ErrorLog	error (errorMsg);
 		dispatcher << error;
+		return -1;
 	}
 	
 	return 0;

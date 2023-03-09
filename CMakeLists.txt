@@ -15,3 +15,4 @@ option (BUILD_SHARED_LIBS "Creation de bibliotheques dynamiques (defaut : ON)" O
 
 add_subdirectory (src)
 
+enable_testing()

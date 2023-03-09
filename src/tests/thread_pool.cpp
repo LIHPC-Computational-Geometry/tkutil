@@ -128,122 +128,122 @@ int main (int argc, char* argv[])
 {
 	try
 	{
+		const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
 
-	const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
+		cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
+			<< nbProcs << " processors." << endl;
 
-	cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
-	     << nbProcs << " processors." << endl;
+		ThreadPool::initialize (nbProcs / 3);
+	//	ThreadPool::initialize (2);
+		srand (time (NULL));
 
-	ThreadPool::initialize (nbProcs / 3);
-//	ThreadPool::initialize (2);
-	srand (time (NULL));
+		size_t						i	= 0;
+		const size_t				max	= 100;
 
-	size_t						i	= 0;
-	const size_t				max	= 100;
-
-	ProtectedWriter*			pwriter	= new ProtectedWriter (stdout);
-	cout << "Creation of " << (unsigned long)max
-	     << " writing tasks with mutexes ..." << endl;
-	size_t	running	= 0, queued = 0;
-	UTF8String	message;
-	for (i = 0; i < max; i++)
-	{
-		WriteTask*	task	= new WriteTask(max, *pwriter, i);
-		task->toDeleteAtCompletion (true);
-		ThreadPool::instance ( ).addTask (*task, true);
-		ThreadPool::instance ( ).stats (running, queued);
-		message.clear ( );
-		message << "Progression : " << (max - running - queued) << "/"
-		        << max << "\n";
-		pwriter->write (message.ascii ( ));
-	}	// for (i = 0; i < max; i++)
-	pwriter->write ("Joining tasks ...\n");
-	ThreadPool::instance ( ).barrier ( );
-	ThreadPool::instance ( ).stats (running, queued);
-	message.clear ( );
-	message << "Progression : " << (max - running - queued) << "/" << max;
-	pwriter->write (message.ascii ( ));
-	pwriter->write ("Joinable writing tasks with mutexes completed.\n\n");
-
-	message.clear ( );
-	message << "Creation of " << (unsigned long)max
-	     << " writing tasks with mutexes and concurrency flag ...\n";
-	pwriter->write (message.ascii ( ));
-	for (i = 0; i < max; i++)
-	{
-		WriteTask*	task	= new WriteTask(max, *pwriter, i);
-		task->toDeleteAtCompletion (true);
-		task->setConcurrencyFlag (i % 2);
-		ThreadPool::instance ( ).addTask (*task, true);
-		ThreadPool::instance ( ).stats (running, queued);
-		message.clear ( );
-		message << "Progression : " << (max - running - queued) << "/"
-		     << max << "\n";
-		pwriter->write (message.ascii ( ));
-	}	// for (i = 0; i < max; i++)
-	pwriter->write ("Joining tasks ...\n");
-	ThreadPool::instance ( ).barrier ( );
-	ThreadPool::instance ( ).stats (running, queued);
-	message.clear ( );
-	message << "Progression : " << (max - running - queued) << "/" << max
-	        << "\n"
-	        << "Joinable writing tasks with mutexes and concurrency flag "
-	        << "completed.\n"
-	        << "Creation of " << (unsigned long)max << " writing tasks with "
-	        << "mutexes and concurrency flag and give them together ...\n";
-	pwriter->write (message.ascii ( ));
-	vector<ThreadPool::TaskIfc*>	tasks;
-	for (i = 0; i < max; i++)
-	{
-		WriteTask*	task	= new WriteTask(max, *pwriter, i);
-		task->toDeleteAtCompletion (false);
-		task->setConcurrencyFlag (i % 2);
-		tasks.push_back (task);
-		ThreadPool::instance ( ).stats (running, queued);
-		message.clear ( );
-		message << "Progression : " << (max - running - queued) << "/"
-		        << max << "\n";
-		pwriter->write (message.ascii ( ));
-	}	// for (i = 0; i < max; i++)
-	ThreadPool::instance ( ).addTasks (tasks, true);
-	pwriter->write ("Joining tasks ...\n");
-	ThreadPool::instance ( ).barrier ( );
-	ThreadPool::instance ( ).stats (running, queued);
-	message.clear ( );
-	message << "Progression : " << (max - running - queued) << "/" << max
-	        << "\n"
-	        << "Joinable writing tasks with mutexes and concurrency flag "
-	        << "given together completed.\n";
-	pwriter->write (message.ascii ( ));
-
-	// On évalue les taches :
-	for (vector<ThreadPool::TaskIfc*>::iterator itt	=  tasks.begin ( );
-	     itt != tasks.end ( ); itt++)
-	{
-		switch ((*itt)->getStatus ( ))
+		ProtectedWriter*			pwriter	= new ProtectedWriter (stdout);
+		cout << "Creation of " << (unsigned long)max
+			<< " writing tasks with mutexes ..." << endl;
+		size_t	running	= 0, queued = 0;
+		UTF8String	message;
+		for (i = 0; i < max; i++)
 		{
-			case ThreadPool::TaskIfc::CANCELED	:
-				cout << "Tache annulée : " << (*itt)->getMessage ( ) << endl;
-				break;
-			case ThreadPool::TaskIfc::IN_ERROR	:
-				cout << "Tache en erreur : " << (*itt)->getMessage ( ) << endl;
-				break;
-		}	// switch ((*itt)->getStatus ( ))
+			WriteTask*	task	= new WriteTask(max, *pwriter, i);
+			task->toDeleteAtCompletion (true);
+			ThreadPool::instance ( ).addTask (*task, true);
+			ThreadPool::instance ( ).stats (running, queued);
+			message.clear ( );
+			message << "Progression : " << (max - running - queued) << "/"
+					<< max << "\n";
+			pwriter->write (message.ascii ( ));
+		}	// for (i = 0; i < max; i++)
+		pwriter->write ("Joining tasks ...\n");
+		ThreadPool::instance ( ).barrier ( );
+		ThreadPool::instance ( ).stats (running, queued);
+		message.clear ( );
+		message << "Progression : " << (max - running - queued) << "/" << max;
+		pwriter->write (message.ascii ( ));
+		pwriter->write ("Joinable writing tasks with mutexes completed.\n\n");
 
-		delete *itt;
-	}	// for (vector<ThreadPool::TaskIfc*>::iterator itt =  tasks.begin ( );
-	
+		message.clear ( );
+		message << "Creation of " << (unsigned long)max
+			<< " writing tasks with mutexes and concurrency flag ...\n";
+		pwriter->write (message.ascii ( ));
+		for (i = 0; i < max; i++)
+		{
+			WriteTask*	task	= new WriteTask(max, *pwriter, i);
+			task->toDeleteAtCompletion (true);
+			task->setConcurrencyFlag (i % 2);
+			ThreadPool::instance ( ).addTask (*task, true);
+			ThreadPool::instance ( ).stats (running, queued);
+			message.clear ( );
+			message << "Progression : " << (max - running - queued) << "/"
+				<< max << "\n";
+			pwriter->write (message.ascii ( ));
+		}	// for (i = 0; i < max; i++)
+		pwriter->write ("Joining tasks ...\n");
+		ThreadPool::instance ( ).barrier ( );
+		ThreadPool::instance ( ).stats (running, queued);
+		message.clear ( );
+		message << "Progression : " << (max - running - queued) << "/" << max
+				<< "\n"
+				<< "Joinable writing tasks with mutexes and concurrency flag "
+				<< "completed.\n"
+				<< "Creation of " << (unsigned long)max << " writing tasks with "
+				<< "mutexes and concurrency flag and give them together ...\n";
+		pwriter->write (message.ascii ( ));
+		vector<ThreadPool::TaskIfc*>	tasks;
+		for (i = 0; i < max; i++)
+		{
+			WriteTask*	task	= new WriteTask(max, *pwriter, i);
+			task->toDeleteAtCompletion (false);
+			task->setConcurrencyFlag (i % 2);
+			tasks.push_back (task);
+			ThreadPool::instance ( ).stats (running, queued);
+			message.clear ( );
+			message << "Progression : " << (max - running - queued) << "/"
+					<< max << "\n";
+			pwriter->write (message.ascii ( ));
+		}	// for (i = 0; i < max; i++)
+		ThreadPool::instance ( ).addTasks (tasks, true);
+		pwriter->write ("Joining tasks ...\n");
+		ThreadPool::instance ( ).barrier ( );
+		ThreadPool::instance ( ).stats (running, queued);
+		message.clear ( );
+		message << "Progression : " << (max - running - queued) << "/" << max
+				<< "\n"
+				<< "Joinable writing tasks with mutexes and concurrency flag "
+				<< "given together completed.\n";
+		pwriter->write (message.ascii ( ));
 
-	ThreadPool::finalize ( );
+		// On évalue les taches :
+		for (vector<ThreadPool::TaskIfc*>::iterator itt	=  tasks.begin ( );
+			itt != tasks.end ( ); itt++)
+		{
+			switch ((*itt)->getStatus ( ))
+			{
+				case ThreadPool::TaskIfc::CANCELED	:
+					cout << "Tache annulée : " << (*itt)->getMessage ( ) << endl;
+					break;
+				case ThreadPool::TaskIfc::IN_ERROR	:
+					cout << "Tache en erreur : " << (*itt)->getMessage ( ) << endl;
+					break;
+			}	// switch ((*itt)->getStatus ( ))
 
+			delete *itt;
+		}	// for (vector<ThreadPool::TaskIfc*>::iterator itt =  tasks.begin ( );
+		
+
+		ThreadPool::finalize ( );
 	}
 	catch (const Exception& exc)
 	{
 		cout << "Exception caught : " << exc.getFullMessage ( ) << endl;
+		return -1;
 	}
 	catch (...)
 	{
 		cout << "Unexpected error caught." << endl;
+		return -1;
 	}
 
 	return 0;

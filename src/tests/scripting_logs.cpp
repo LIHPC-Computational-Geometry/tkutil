@@ -29,6 +29,7 @@ int main (int argc, char* argv [])
 //		log1 << string ("une chaine de caracteres") << true << -12 << 23.456e-7;
 		log1 << str1 << bool1 << long1 << double1;
 		*stdOstream << log1;
+		delete stdOstream;
 //cout << "MANTISSE : " << numeric_limits<double>::digits << endl;
 //cout << "MANTISSE : " << numeric_limits<float>::digits << endl;
 	}
@@ -36,11 +37,15 @@ int main (int argc, char* argv [])
 	{
 		ErrorLog	error (exc);
 		*stdOstream << error;
+		delete stdOstream;
+		return -1;
 	}
 	catch (const std::exception& e)
 	{
 		ErrorLog	error (e);
 		*stdOstream << error;
+		delete stdOstream;
+		return -1;
 	}
 	catch (...)
 	{
@@ -48,9 +53,9 @@ int main (int argc, char* argv [])
 		errorMsg << "Erreur non renseignée.";
 		ErrorLog	error (errorMsg);
 		*stdOstream << error;
+		delete stdOstream;
+		return -1;
 	}
-
-	delete stdOstream;
 
 	return 0;
 }	// main

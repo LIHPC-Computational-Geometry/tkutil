@@ -12,4 +12,4 @@ jobs:
     name: Call Cmake reusable workflow
     uses: LIHPC-Computational-Geometry/lihpccg-ci/.github/workflows/cmake-reusable.yml@main
     with:
-      run-tests: false
+      run-tests: true

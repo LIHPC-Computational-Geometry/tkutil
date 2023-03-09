@@ -117,66 +117,68 @@ int main (int argc, char* argv[])
 cout << "THR " << (unsigned long)current << " PRIORITY : " << param.__sched_priority << " POLICY : " << policy << endl; */
 	try
 	{
+		const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
 
-	const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
+		cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
+			<< nbProcs << " processors." << endl;
 
-	cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
-	     << nbProcs << " processors." << endl;
+		vector <JoinableThread*>	tasks;
+		size_t						i	= 0;
+		const size_t				max	= 10;
+		Writer						writer (stdout);
+		cout << "Creation of " << (unsigned long)max
+			<< " joinable writing tasks without mutex ..." << endl;
+		for (i = 0; i < max; i++)
+			tasks.push_back (new WriterThread (max, writer));
+		cout << "Running tasks ..." << endl;
+		for (i = 0; i < max; i++)
+			tasks [i]->startTask ( );
+		// Rem : sched_yield important, on peut sinon observer des plantages,
+		// probablement à cause de tâches qui ne se sont pas encore lancées.
+		sched_yield ( );
+		cout << "Joining tasks ..." << endl;
+		for (i = 0; i < max; i++)
+		{
+			tasks [i]->join ( );
+		}
+		cout << "Joinable writing tasks without mutex completed." << endl;
+		cout << "Deleting tasks ..." << endl;
+		for (i = 0; i < max; i++)
+			delete tasks [i];
+		cout << endl << endl;
 
-	vector <JoinableThread*>	tasks;
-	size_t						i	= 0;
-	const size_t				max	= 10;
-	Writer						writer (stdout);
-	cout << "Creation of " << (unsigned long)max
-	     << " joinable writing tasks without mutex ..." << endl;
-	for (i = 0; i < max; i++)
-		tasks.push_back (new WriterThread (max, writer));
-	cout << "Running tasks ..." << endl;
-	for (i = 0; i < max; i++)
-		tasks [i]->startTask ( );
-	// Rem : sched_yield important, on peut sinon observer des plantages,
-	// probablement à cause de tâches qui ne se sont pas encore lancées.
-	sched_yield ( );
-	cout << "Joining tasks ..." << endl;
-	for (i = 0; i < max; i++)
-	{
-		tasks [i]->join ( );
-	}
-	cout << "Joinable writing tasks without mutex completed." << endl;
-	cout << "Deleting tasks ..." << endl;
-	for (i = 0; i < max; i++)
-		delete tasks [i];
-	cout << endl << endl;
-
-	tasks.clear ( );
-	ProtectedWriter			pwriter (stdout);
-	cout << "Creation of " << (unsigned long)max
-	     << " joinable writing tasks with mutexes ..." << endl;
-	for (i = 0; i < max; i++)
-		tasks.push_back (new WriterThread (max, pwriter));
-	cout << "Running tasks ..." << endl;
-	for (i = 0; i < max; i++)
-		tasks [i]->startTask ( );
-	sched_yield ( );
-	cout << "Joining tasks ..." << endl;
-	for (i = 0; i < max; i++)
-	{
-		tasks [i]->join ( );
-//		delete tasks [i];
-cout << "Deleting tasks." << endl;
-	}
-for (i = 0; i < max; i++)
-	delete tasks [i];
-	cout << "Joinable writing tasks with mutexes completed." << endl;
-
+		tasks.clear ( );
+		ProtectedWriter			pwriter (stdout);
+		cout << "Creation of " << (unsigned long)max
+			<< " joinable writing tasks with mutexes ..." << endl;
+		for (i = 0; i < max; i++)
+			tasks.push_back (new WriterThread (max, pwriter));
+		cout << "Running tasks ..." << endl;
+		for (i = 0; i < max; i++)
+			tasks [i]->startTask ( );
+		sched_yield ( );
+		cout << "Joining tasks ..." << endl;
+		for (i = 0; i < max; i++)
+		{
+			tasks [i]->join ( );
+			//		delete tasks [i];
+			cout << "Deleting tasks." << endl;
+		}
+		for (i = 0; i < max; i++)
+		{
+			delete tasks [i];
+		}
+		cout << "Joinable writing tasks with mutexes completed." << endl;
 	}
 	catch (const Exception& exc)
 	{
 		cout << "Exception caught : " << exc.getFullMessage ( ) << endl;
+		return -1;
 	}
 	catch (...)
 	{
 		cout << "Unexpected error caught." << endl;
+		return -1;
 	}
 
 	return 0;
