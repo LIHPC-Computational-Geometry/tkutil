@@ -41,9 +41,9 @@ Mutex					ThreadIfc::_mutex;
 
 
 ThreadIfc::ThreadIfc (size_t concurrencyFlag)
-	: _concurrencyFlag (concurrencyFlag), _thread (0),
-	  _running (false), _cancelled (false)
-{
+	: _concurrencyFlag (concurrencyFlag), _thread (0), _running (true), _cancelled (false)	// v 6.2.0
+{	// v 6.2.0 : true est affecté d'emblée à _running car il pouvait arriver que join soit invoqué avant que startTask
+	// n'aie appelé run_thread ou que tout au moins que run_thread n'aie affecté true à running.
 	registerThread (this);
 }	// ThreadIfc::ThreadIfc
 
@@ -104,8 +104,7 @@ ThreadIfc* ThreadIfc::withId (pthread_t id)
 
 	AutoMutex	mutex (&_mutex);
 
-	for (vector<ThreadIfc*>::iterator it = _threads.begin ( );
-	     _threads.end ( ) != it; it++)
+	for (vector<ThreadIfc*>::iterator it = _threads.begin ( ); _threads.end ( ) != it; it++)
 	{
 		CHECK_NULL_PTR_ERROR (*it)
 		if ((*it)->getId ( ) == id)
@@ -132,8 +131,7 @@ void ThreadIfc::unregisterThread (ThreadIfc* thread)
 	AutoMutex	mutex (&_mutex);
 
 	CHECK_NULL_PTR_ERROR (thread)
-	for (vector<ThreadIfc*>::iterator it = _threads.begin ( );
-	     _threads.end ( ) != it; it++)
+	for (vector<ThreadIfc*>::iterator it = _threads.begin ( ); _threads.end ( ) != it; it++)
 	{
 		if (*it == thread)
 		{
@@ -155,8 +153,7 @@ void* ThreadIfc::run_thread (void* t)
 
 	try
 	{
-		// ThreadManager::instance ( ) lève une exception si l'API n'est pas
-		// initialisée.
+		// ThreadManager::instance ( ) lève une exception si l'API n'est pas initialisée.
 		ThreadManager::instance ( ).taskCompleted (thread);
 	}
 	catch (...)
@@ -250,8 +247,7 @@ void JoinableThread::startTask ( )
 #ifdef FORCE_THREADS_STACK_SIZE
 	CHECK_POSIX_CALL (pthread_attr_setstacksize(&attr,(2*PTHREAD_STACK_MIN)), "pthread_attr_setstacksize")
 #endif	// FORCE_THREADS_STACK_SIZE
-	CHECK_POSIX_CALL (pthread_create (&getPosixThread ( ), &attr,
-			                  ThreadIfc::run_thread, this), "pthread_create")
+	CHECK_POSIX_CALL (pthread_create (&getPosixThread ( ), &attr, ThreadIfc::run_thread, this), "pthread_create")
 	CHECK_POSIX_CALL (pthread_attr_destroy (&attr), "pthread_attr_destroy")
 }	// JoinableThread::startTask
 
@@ -261,8 +257,7 @@ void JoinableThread::join ( )
 	if (true == isRunning ( ))
 	{
 		void*	status	= 0;
-		CHECK_POSIX_CALL(
-					pthread_join (getPosixThread ( ), &status), "pthread_join")
+		CHECK_POSIX_CALL(pthread_join (getPosixThread ( ), &status), "pthread_join")
 	}	// if (true == isRunning ( ))
 }	// JoinableThread::join
 
