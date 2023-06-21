@@ -108,8 +108,6 @@ static string getRemoteOsType (const string& hostName)
 {
 	Process*	process	= new Process ("rsh");
 	process->getOptions ( ).addOption (hostName);
-// 		EXPURGE_BEGINNING_TAG OS
-// 	EXPURGE_COMPLETION_TAG
 	process->enableChildToSonCommunications ( );
 	process->execute (false);
 	string	osType;

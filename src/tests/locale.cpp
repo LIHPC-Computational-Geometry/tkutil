@@ -91,7 +91,7 @@ int main (int, char*[])
 	}
 	catch (...)
 	{
-		cout << "Exception innattendue." << endl;
+		cout << "Exception inattendue." << endl;
 		return -1;
 	}
 

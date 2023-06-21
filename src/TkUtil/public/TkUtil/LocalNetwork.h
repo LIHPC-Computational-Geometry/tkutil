@@ -156,14 +156,23 @@ class LocalNetwork
 
 	/**
 	 * @return		La commande utilisée pour obtenir le "home utilisateur".
+	 * @see			setHomeCommand
 	 */
 	static std::string getHomeCommand ( );
 
+	/**
+	 * @param		La commande utilisée pour obtenir le "home utilisateur". Vaut "home" par défaut.
+	 * @see			getHomeCommand
+	 */
+	static void setHomeCommand (const std::string& command);	// v 6.1.0
 
 	private :
 
+	/** La commande "home". */
+	static std::string					_homeCommand;			// v 6.1.0
+	
 	/** Les noms de calculateur. */
-	static std::vector<HPComputer>		_computers;		// v 5.9.0
+	static std::vector<HPComputer>		_computers;				// v 5.9.0
 	
 	/**
 	 * Constructeurs, destructeur : interdits.

@@ -13,33 +13,23 @@ BEGIN_NAMESPACE_UTIL
 static const Charset	charset ("àéèùô");
 
 
-ScriptingLog::ScriptingLog (
-		const string& name, const string& method, const string& result,
-		const UTF8String& comment)
+ScriptingLog::ScriptingLog (const string& name, const string& method, const string& result,	const UTF8String& comment)
 	: DefaultLog (ScriptingLog::SCRIPTING, comment), _formated (false),
-	  _name (name), _methodName (method), _result (result), _tags ( ),
-	  _comment (comment), _arguments ( ), _text ( ), _namedObject (0)
+	  _name (name), _methodName (method), _result (result), _tags ( ), _comment (comment), _arguments ( ), _text ( ), _namedObject (0)
 {
 }	// ScriptingLog::ScriptingLog ( )
 
 
-ScriptingLog::ScriptingLog (
-		const ReferencedNamedObject& object, const string& method,
-		const string& result, const UTF8String& comment)
+ScriptingLog::ScriptingLog (const ReferencedNamedObject& object, const string& method, const string& result, const UTF8String& comment)
 	: DefaultLog (ScriptingLog::SCRIPTING, comment), _formated (false),
-	  _name (object.getUniqueName ( )),
-	  _methodName (method), _result (result), _tags ( ),
-	  _comment (comment), _arguments ( ), _text ( ), _namedObject (&object)
+	  _name (object.getUniqueName ( )), _methodName (method), _result (result), _tags ( ), _comment (comment), _arguments ( ), _text ( ), _namedObject (&object)
 {
 }	// ScriptingLog::ScriptingLog ( )
 
 
-ScriptingLog::ScriptingLog (
-					const string& instruction, const UTF8String& comment)
+ScriptingLog::ScriptingLog (const string& instruction, const UTF8String& comment)
 	: DefaultLog (ScriptingLog::SCRIPTING, UTF8String (charset)),
-	  _formated (true), _name ( ), _methodName ( ), _result ( ), _tags ( ),
-	  _comment (comment), _arguments ( ), _text (instruction, charset),
-	  _namedObject (0)
+	  _formated (true), _name ( ), _methodName ( ), _result ( ), _tags ( ), _comment (comment), _arguments ( ), _text (instruction, charset), _namedObject (0)
 {
 }	// ScriptingLog::ScriptingLog
 
@@ -161,16 +151,14 @@ void ScriptingLog::setComment (const UTF8String& comment)
 }	// ScriptingLog::setComment
 
 
-pair < ScriptingLog::ARG_TYPE, string > ScriptingLog::getMethodArgument (
-																size_t i) const
+pair < ScriptingLog::ARG_TYPE, string > ScriptingLog::getMethodArgument (size_t i) const
 {
 	if (_arguments.size ( ) < i)
 	{
 		UTF8String	msg (charset);
 		msg << "ScriptingLog::getMethodArgument. Argument invalide ("
 		    << (unsigned long)i << "). La méthode " << getMethodName ( )
-		    << " n'a que " << (unsigned long)_arguments.size ( ) 
-		    << " arguments.";
+		    << " n'a que " << (unsigned long)_arguments.size ( ) << " arguments.";
 		throw Exception (msg);
 	}	// if (_arguments.size ( ) < i)
 
@@ -219,8 +207,7 @@ ScriptingLog& ScriptingLog::operator << (bool arg)
 
 void ScriptingLog::addMethodArgument (long arg)
 {
-	_arguments.push_back (pair < ARG_TYPE, string > (
-									LONG, NumericConversions::toStr (arg)));
+	_arguments.push_back (pair < ARG_TYPE, string > (LONG, NumericConversions::toStr (arg)));
 }	// ScriptingLog::addMethodArgument (long)
 
 
@@ -270,6 +257,9 @@ void ScriptingLog::addMethodArgument (const ReferencedNamedObject* object)
 }	// ScriptingLog::addMethodArgument (const ReferencedNamedObject&)
 
 
-
+void ScriptingLog::addMethodArgument (ScriptingLog::ARG_TYPE type, const string& value)		// v 6.4.0
+{
+	_arguments.push_back (pair < ARG_TYPE, string > (type, value));
+}	// ScriptingLog::addMethodArgument
 
 END_NAMESPACE_UTIL

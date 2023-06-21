@@ -283,7 +283,7 @@ void File::create (bool asFile)
 		umask (currentMask);
 		if (true == asFile)
 		{
-			int	descriptor	= ::open (getFullFileName ( ).c_str ( ), O_RDWR | O_CREAT | O_TRUNC, mask);	// v 5.13.2 : + O_RDWR | O_CREAT | O_TRUNC
+			int	descriptor	= ::open (getFullFileName ( ).c_str ( ), O_RDWR |O_CREAT | O_TRUNC, mask);	// v 5.13.2 : + O_RDWR | O_CREAT | O_TRUNC
 			if (-1 == descriptor)
 				throw Exception (UTF8String (strerror (errno), charset));
 

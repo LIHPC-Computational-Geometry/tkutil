@@ -3,10 +3,7 @@
 // Retourne les chaines de caractères reçues sur ce port.
 //
 
-// EXPURGE_BEGINNING_TAG EXEMPLE
-// EXPURGE_COMPLETION_TAG
-
-// /opt/bin/echo_srv-icpc.15.0.2-debug 11111
+// /opt/bin/echo_srv-debug 11111
 // Noeud de login toto du calculateur :
 // socket_proxy -connect toto:11111 -listen 20000 -bufferSize 5000
 // Client sur station :
