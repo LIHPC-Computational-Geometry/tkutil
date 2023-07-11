@@ -21,7 +21,8 @@ BEGIN_NAMESPACE_UTIL
 static const	Charset	charset ("àéèùô");
 
 
-vector<LocalNetwork::HPComputer>		LocalNetwork::_computers;	// v 5.9.0
+string									LocalNetwork::_homeCommand ("home");	// v 6.1.0
+vector<LocalNetwork::HPComputer>		LocalNetwork::_computers;				// v 5.9.0
 
 
 LocalNetwork::LocalNetwork ( )
@@ -311,8 +312,6 @@ string LocalNetwork::getUserHome (const string& computerName)	// Réécriture en
 		}	// while (false == ok)
 		if (0 != (status = pwdProcess->getCompletionCode ( )))
 			status = pwdProcess->wait ( );
-// EXPURGE_BEGINNING_TAG LocalNetwork::getUserHome
-// EXPURGE_COMPLETION_TAG
 	}
 	catch (...)
 	{
@@ -421,11 +420,13 @@ bool LocalNetwork::isRemoteHost ( )
 
 string LocalNetwork::getHomeCommand ( )
 {
-// EXPURGE_BEGINNING_TAG LocalNetwork::getHomeCommand
-// EXPURGE_COMPLETION_TAG
-
-	return "home";
+	return _homeCommand;	// v 6.1.0
 }	// LocalNetwork::getHomeCommand
 
+
+void LocalNetwork::setHomeCommand (const string& command)	// v 6.1.0
+{
+	_homeCommand	= command;
+}	// LocalNetwork::setHomeCommand
 
 END_NAMESPACE_UTIL

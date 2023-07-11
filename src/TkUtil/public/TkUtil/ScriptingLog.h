@@ -30,39 +30,29 @@ class ScriptingLog : public DefaultLog
 
 	/**
 	 * Constructeur.
-	 * @param		Chaîne de caractère permettant d'identifier l'instance à
-	 *				invoquer (nom d'instance unique).
+	 * @param		Chaîne de caractère permettant d'identifier l'instance à invoquer (nom d'instance unique).
 	 * @param		Nom de la méthode à invoquer.
-	 * @param		Nom de la variable recevant le résultat, s'il y en a une,
-	 *				ou une chaine vide en l'absence d'affectation.
+	 * @param		Nom de la variable recevant le résultat, s'il y en a une, ou une chaine vide en l'absence d'affectation.
 	 * @param		Eventuel commentaire de l'instruction.
 	 */
-	ScriptingLog (const IN_STD string& name, const IN_STD string& method,
-	              const IN_STD string& result,
-	              const UTF8String& comment = UTF8String ( ));
+	ScriptingLog (const IN_STD string& name, const IN_STD string& method, const IN_STD string& result, const UTF8String& comment = UTF8String ( ));
 
 	/**
 	 * Constructeur.
-	 * @param		Objet référencé à invoquer. L'instance sera récupérée depuis
-	 *				un script en utilisant son nom unique (<I>getUniqueName</I>)
+	 * @param		Objet référencé à invoquer. L'instance sera récupérée depuis un script en utilisant son nom unique (<I>getUniqueName</I>)
 	 *				via la classe <I>ReferencedObjectManager</I>.
 	 * @param		Nom de la méthode à invoquer.
-	 * @param		Nom de la variable recevant le résultat, s'il y en a une,
-	 *				ou une chaine vide en l'absence d'affectation.
+	 * @param		Nom de la variable recevant le résultat, s'il y en a une, ou une chaine vide en l'absence d'affectation.
 	 * @param		Eventuel commentaire de l'instruction.
 	 */
-	ScriptingLog (const ReferencedNamedObject& object,
-	              const IN_STD string& method, const IN_STD string& result = "",
-	              const UTF8String& comment = UTF8String ( ));
+	ScriptingLog (const ReferencedNamedObject& object, const IN_STD string& method, const IN_STD string& result = "", const UTF8String& comment = UTF8String ( ));
 
 	/**
 	 * Constructeur "instruction formattée".
-	 * @param		L'instruction, déjà formattée dans le langage script cible.
-	 * 				Cette instruction est écrite telle que.
+	 * @param		L'instruction, déjà formattée dans le langage script cible. Cette instruction est écrite telle que.
 	 * @param		Eventuel commentaire de l'instruction.
 	 */
-	ScriptingLog (const IN_STD string& instruction,
-	              const UTF8String& comment);
+	ScriptingLog (const IN_STD string& instruction, const UTF8String& comment);
 
 	/**
 	 * Constructeur de copie et opérateur = : RAS.
@@ -76,14 +66,12 @@ class ScriptingLog : public DefaultLog
 	virtual ~ScriptingLog ( );
 
 	/**
-	 * @return		Une copie de l'instance. Cette copie est à prendre en charge
-	 *				par l'appelant, y compris sa destruction.
+	 * @return		Une copie de l'instance. Cette copie est à prendre en charge par l'appelant, y compris sa destruction.
 	 */
 	virtual Log* clone ( ) const;
 
 	/**
-	 * @return		<I>true</I> si le log est formatté, c'est à dire qu'à sa
-	 *				création le texte a été transmis tel qu'il doit être écrit,
+	 * @return		<I>true</I> si le log est formatté, c'est à dire qu'à sa création le texte a été transmis tel qu'il doit être écrit,
 	 *				<I>false</I> dans le cas contraire.
 	 */
 	virtual bool isFormated ( ) const
@@ -121,8 +109,7 @@ class ScriptingLog : public DefaultLog
 	virtual void setMethodName (const IN_STD string& method);
 
 	/**
-	 * @return		Le nom de la variable recevant le résultat, s'il y en a une,
-	 *				ou une chaine vide.
+	 * @return		Le nom de la variable recevant le résultat, s'il y en a une, ou une chaine vide.
 	 * @see			hasResult
 	 * @see			setResult
 	 */
@@ -130,23 +117,20 @@ class ScriptingLog : public DefaultLog
 	{ return _result; }
 
 	/**
-	 * @return		true en cas de résultat à affecter à une variable, false
-	 *				dans le cas contraire.
+	 * @return		true en cas de résultat à affecter à une variable, false dans le cas contraire.
 	 * @see			getResult
 	 * @see			setResult
 	 */
 	virtual bool hasResult ( ) const;
 
 	/**
-	 * @param		Le nom de la variable recevant le résultat, ou une chaine
-	 *				vide en l'absence d'affectation à faire.
+	 * @param		Le nom de la variable recevant le résultat, ou une chaine vide en l'absence d'affectation à faire.
 	 * @see			getResult
 	 */
 	virtual void setResult (const IN_STD string& result);
 
 	/**
-	 * @return		true si des couples (balise, valeur) sont associés à
-	 *				l'instruction, false dans le cas contraire.
+	 * @return		true si des couples (balise, valeur) sont associés à l'instruction, false dans le cas contraire.
 	 * @see			getTags
 	 * @see			addTag
 	 */
@@ -162,15 +146,13 @@ class ScriptingLog : public DefaultLog
 	{ return _tags; }
 
 	/**
-	 * Ajoute le couple (balise, valeur) sans attributs aux valeurs balisées
-	 * associés à l'instruction.	
+	 * Ajoute le couple (balise, valeur) sans attributs aux valeurs balisées associés à l'instruction.	
 	 * @see			getTags
 	 */
 	virtual void addTag (const IN_STD string& name, const IN_STD string& value);
 
 	/**
-	 * Ajoute la valeur balisée transmise en arguments aux valeurs associées à
-	 * l'instruction.	
+	 * Ajoute la valeur balisée transmise en arguments aux valeurs associées à l'instruction.	
 	 * @see			getTags
 	 */
 	virtual void addTag (const TaggedValue& taggedValue);
@@ -202,17 +184,14 @@ class ScriptingLog : public DefaultLog
 	{ return _arguments.size ( ); }
 
 	/**
-	 * @return		Le i-ème argument de la méthode sous forme de paire
-	 *				type-valeur (premier indice : 0).
+	 * @return		Le i-ème argument de la méthode sous forme de paire type-valeur (premier indice : 0).
 	 * @exception	Une exception est levée en cas d'indice invalide.
 	 * @see			getMethodArgumentsCount
 	 */
-	virtual IN_STD pair < ARG_TYPE, IN_STD string > getMethodArgument (
-																size_t i) const;
+	virtual IN_STD pair < ARG_TYPE, IN_STD string > getMethodArgument (size_t i) const;
 
 	/**
-	 * Ajoute à l'appel de la méthode l'argument de type chaîne de caractères
-	 * dont la valeur est tranmise en argument.
+	 * Ajoute à l'appel de la méthode l'argument de type chaîne de caractères dont la valeur est transmise en argument.
 	 * @param		Valeur de l'argument
 	 * @see			getMethodArgumentsCount
 	 * @see			getMethodArgument
@@ -223,8 +202,7 @@ class ScriptingLog : public DefaultLog
 	virtual ScriptingLog& operator << (const char* arg);
 
 	/**
-	 * Ajoute à l'appel de la méthode l'argument de type bouléen
-	 * dont la valeur est tranmise en argument.
+	 * Ajoute à l'appel de la méthode l'argument de type bouléen dont la valeur est transmise en argument.
 	 * @param		Valeur de l'argument
 	 * @see			getMethodArgumentsCount
 	 * @see			getMethodArgument
@@ -233,8 +211,7 @@ class ScriptingLog : public DefaultLog
 	virtual ScriptingLog& operator << (bool arg);
 
 	/**
-	 * Ajoute à l'appel de la méthode l'argument de type entier long
-	 * dont la valeur est tranmise en argument.
+	 * Ajoute à l'appel de la méthode l'argument de type entier long dont la valeur est transmise en argument.
 	 * @param		Valeur de l'argument
 	 * @see			getMethodArgumentsCount
 	 * @see			getMethodArgument
@@ -243,8 +220,7 @@ class ScriptingLog : public DefaultLog
 	virtual ScriptingLog& operator << (long arg);
 
 	/**
-	 * Ajoute à l'appel de la méthode l'argument de type réel double précision
-	 * dont la valeur est tranmise en argument.
+	 * Ajoute à l'appel de la méthode l'argument de type réel double précision dont la valeur est transmise en argument.
 	 * @param		Valeur de l'argument
 	 * @see			getMethodArgumentsCount
 	 * @see			getMethodArgument
@@ -253,10 +229,8 @@ class ScriptingLog : public DefaultLog
 	virtual ScriptingLog& operator << (double arg);
 
 	/**
-	 * Ajoute à l'appel de la méthode l'instance dont le nom dans le script
-	 * est transmis en argument. Se distingue de la méthode de même nom
-	 * prenant en argument une instance de la classe ReferencedNamedObject par
-	 * le fait que la variable peut être de n'importe quel type et qu'elle ne
+	 * Ajoute à l'appel de la méthode l'instance dont le nom dans le script est transmis en argument. Se distingue de la méthode de même nom
+	 * prenant en argument une instance de la classe ReferencedNamedObject par le fait que la variable peut être de n'importe quel type et qu'elle ne
 	 * sera donc pas appelée dans le script via l'API ReferencedObjectManager.
 	 * @see			getMethodArgumentsCount
 	 * @see			getMethodArgument
@@ -264,8 +238,7 @@ class ScriptingLog : public DefaultLog
 	virtual void addVariable (const IN_STD string& name);
 
 	/**
-	 * Ajoute à l'appel de la méthode l'instance dont le nom dans le script
-	 * est transmis en argument.
+	 * Ajoute à l'appel de la méthode l'instance dont le nom dans le script est transmis en argument.
 	 * @see			getMethodArgumentsCount
 	 * @see			getMethodArgument
 	 * @see			ReferencedObjectManager
@@ -274,10 +247,14 @@ class ScriptingLog : public DefaultLog
 	virtual ScriptingLog& operator << (const ReferencedNamedObject* object);
 
 	/**
-	 * @return		<I>true</I> si l'instance doit être récupérée par le script
-	 *				en utilisant l'API de la classe
-	 *				<I>ReferencedObjectManager</I>, <I>false</I> dans le cas
-	 *				contraire.
+	 * Ajoute à l'appel de la méthode l'argument de type transmis en argument dont la valeur est transmise en second argument.
+	 * A utiliser avec parcimonie !
+	 */
+	 virtual void addMethodArgument (ARG_TYPE, const std::string&);		// v 6.4.0
+
+	/**
+	 * @return		<I>true</I> si l'instance doit être récupérée par le script en utilisant l'API de la classe
+	 *				<I>ReferencedObjectManager</I>, <I>false</I> dans le cas contraire.
 	 * @see			getNamedObject
 	 */
 	virtual bool useObjectManagerApi ( ) const

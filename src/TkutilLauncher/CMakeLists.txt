@@ -1,16 +1,14 @@
 set (CURRENT_PACKAGE_NAME "TkutilLauncher")
 
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/workarounds.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/workarounds.cmake)
 
 add_executable (tkutil_launcher tkutil_launcher.cpp)
 
 target_link_libraries (tkutil_launcher PUBLIC TkUtil)
 # INSTALL_RPATH modifie le rpath pour les libs internes au projet :
-set_target_properties (tkutil_launcher PROPERTIES 
-		INSTALL_RPATH_USE_LINK_PATH 1
-		INSTALL_RPATH ${CMAKE_PACKAGE_RPATH_DIR})
+set_target_properties (tkutil_launcher PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1 INSTALL_RPATH ${CMAKE_PACKAGE_RPATH_DIR})
 
 # INSTALLATION :
 include(CMakePackageConfigHelpers)
@@ -19,8 +17,7 @@ include(CMakePackageConfigHelpers)
 # notamment au niveau des vues.
 set (ConfigPackageLocation ${CMAKE_CMAKE_DIR})
 
-install(TARGETS tkutil_launcher EXPORT TkutilLauncher DESTINATION ${CMAKE_INSTALL_BINDIR}
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+install(TARGETS tkutil_launcher EXPORT TkutilLauncher DESTINATION ${CMAKE_INSTALL_BINDIR} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # Utilisation par d'autres modules de TkutilLauncher :
 set (RUNTIME_INSTALL_DIR bin/)		# TkUtilLauncher_RUNTIME_DIR avec TkutilLauncherConfig.cmake.in

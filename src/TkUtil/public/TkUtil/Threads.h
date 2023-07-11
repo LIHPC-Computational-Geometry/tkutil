@@ -16,15 +16,11 @@ class Mutex;
 
 
 /**
- * <P>Cette interface représente un thread générique. Sa spécialisation en 
- * thread détaché ou non intervient dans les classes d'implémentation
- * dérivées.</P>
+ * <P>Cette interface représente un thread générique. Sa spécialisation en thread détaché ou non intervient dans les classes d'implémentation dérivées.</P>
  *
- * <P>Les méthodes de cette classe sont susceptibles de lever des exceptions
- * de type <I>Exception</I> du module <I>util</I>.</P>
+ * <P>Les méthodes de cette classe sont susceptibles de lever des exceptions de type <I>Exception</I> du module <I>util</I>.</P>
  *
- * <P>Cette classe est compatible avec la classe <I>ThreadManager</I>. 
- * L'éventuelle instance de la classe <I>ThreadManager</I> est informée des
+ * <P>Cette classe est compatible avec la classe <I>ThreadManager</I>. L'éventuelle instance de la classe <I>ThreadManager</I> est informée des
  * fins de tâches en vue d'en relancer d'autres.</P>
  *
  * @author	Charles PIGNEROL, CEA/DAM/DSSI
@@ -51,8 +47,7 @@ class ThreadIfc
 	virtual bool isRunning ( ) const;
 
 	/**
-	 * @return		<I>true</I> si l'annulation du thread a été demandée (par
-	 * 				appel à <I>cancel</I>).
+	 * @return		<I>true</I> si l'annulation du thread a été demandée (par appel à <I>cancel</I>).
 	 * @see			cancel
 	 */
 	virtual bool cancelRequested ( ) const;
@@ -63,24 +58,19 @@ class ThreadIfc
 	virtual void startTask ( ) = 0;
 
 	/**
-	 * @return		true si le thread est joignable, au sens POSIX, false
-	 *				dans le cas contraire.
+	 * @return		true si le thread est joignable, au sens POSIX, false dans le cas contraire.
 	 */
 	virtual bool isJoinable ( ) const = 0;
 
 	/**
 	 * Arrête le thread si cela est possible.
-	 * @warning		<B>Méthode très dangereuse, pouvant être à l'origine de
-	 *				fuites mémoires, dead locks (mutex non dévérrouillés),
-	 *				plantages, ... A éviter autant que possible.</B>
+	 * @warning		<B>Méthode très dangereuse, pouvant être à l'origine de fuites mémoires, dead locks (mutex non dévérrouillés), plantages, ... A éviter autant que possible.</B>
 	 * @see			cancelRequested
 	 */
 	virtual void cancel ( );
 
 	/**
-	 * @return		Le drapeau de concurrence de cette tâche. Deux tâches
-	 *				dont un & sur ce drapeau est non nul ne doivent pas être
-	 *				exécutées concurremment.
+	 * @return		Le drapeau de concurrence de cette tâche. Deux tâches dont un & sur ce drapeau est non nul ne doivent pas être exécutées concurremment.
 	 * @see			setConcurrencyFlag
 	 * @see			ThreadManager
 	 */
@@ -88,9 +78,7 @@ class ThreadIfc
 	{ return _concurrencyFlag; }
 
 	/**
-	 * @param		Le nouveau drapeau de concurrence de cette tâche. S'il est
-	 *				nul cette tâche peut s'exécuter en même temps que toute
-	 *				autre tâche.
+	 * @param		Le nouveau drapeau de concurrence de cette tâche. S'il est nul cette tâche peut s'exécuter en même temps que toute autre tâche.
 	 * @see			getConcurrencyFlag
 	 * @see			ThreadManager
 	 */
@@ -98,15 +86,13 @@ class ThreadIfc
 	{ _concurrencyFlag	= concurrencyFlag; }
 
 	/**
-	 * @return		L'instance de cette classe associée au thread courrant,
-	 *				s'il y en a une.
+	 * @return		L'instance de cette classe associée au thread courrant, s'il y en a une.
 	 * @see			withId
 	 */
 	static ThreadIfc* current ( );
 
 	/**
-	 * @return		L'instance de cette classe associée à l'identifiant transmis
-	 *				en argument, s'il y en a une.
+	 * @return		L'instance de cette classe associée à l'identifiant transmis en argument, s'il y en a une.
 	 * @see			current
 	 */
 	static ThreadIfc* withId (pthread_t id);
@@ -124,8 +110,7 @@ class ThreadIfc
 	ThreadIfc (size_t concurrencyFlag);
 
 	/**
-	 * Effectue la tâche parallèlisée. A implémenter dans les classes
-	 * dérivées.
+	 * Effectue la tâche parallèlisée. A implémenter dans les classes dérivées.
 	 * @warning		<B>Cette méthode ne doit pas lever d'exception.</B>
 	 */
 	virtual void execute ( ) = 0;
@@ -139,9 +124,7 @@ class ThreadIfc
 	{ return _thread; }
 
 	/**
-	 * <P>Appelle <I>execute</I> pour le thread reçu en argument. Informe
-	 * l'éventuelle instance de la classe <I>ThreadManager</I> de la fin
-	 * d'exécution de la tâche.</P>
+	 * <P>Appelle <I>execute</I> pour le thread reçu en argument. Informe l'éventuelle instance de la classe <I>ThreadManager</I> de la fin d'exécution de la tâche.</P>
 	 * @see		ThreadManager
 	 */
 	static void* run_thread (void*);
@@ -181,9 +164,7 @@ class ThreadIfc
 
 /**
  *
- * <P>Classe de base implémentant un <B>thread détaché</B>.
- * La méthode <B>execute</B> de cette classe est à surcharger afin d'effectuer
- * la tâche à parallèliser.
+ * <P>Classe de base implémentant un <B>thread détaché</B>. La méthode <B>execute</B> de cette classe est à surcharger afin d'effectuer la tâche à parallèliser.
  * </P>
  *
  @warning		<B>Classe non totalement implémentée, et non testée.</B>
@@ -227,12 +208,10 @@ class DetachedThread : public ThreadIfc
 
 
 /**
- * <P>Classe de base implémentant un thread non détaché. La fin d'exécution de
- * la tâche de ce thread (méthode <B>execute</B>) peut être attendue par
+ * <P>Classe de base implémentant un thread non détaché. La fin d'exécution de la tâche de ce thread (méthode <B>execute</B>) peut être attendue par
  * invocation de sa méthode <B>join</B>.
  * </P>
- * <P>La méthode <B>execute</B> de cette classe est à surcharger afin
- * d'effectuer la tâche à parallèliser.</P>
+ * <P>La méthode <B>execute</B> de cette classe est à surcharger afin d'effectuer la tâche à parallèliser.</P>
  */
 class JoinableThread : public ThreadIfc
 {
@@ -278,8 +257,7 @@ class JoinableThread : public ThreadIfc
 
 
 /**
- * Classe destinée à véhiculer des données utilables par un thread et à 
- * fournir en fin de tâche des informations sur l'accomplissement de celle-ci.
+ * Classe destinée à véhiculer des données utilables par un thread et à fournir en fin de tâche des informations sur l'accomplissement de celle-ci.
  * @see		ReportedJoinableThread
  */
 class ThreadData
@@ -297,8 +275,7 @@ class ThreadData
 	 * Constructeur de copie et opérateur =. RAS.
 	 */
 	ThreadData (const ThreadData& td)
-		: _success (td.hasSucceeded ( )),
-		  _completionMessage (td.getCompletionMessage ( ))
+		: _success (td.hasSucceeded ( )), _completionMessage (td.getCompletionMessage ( ))
 	{ }
 	ThreadData& operator = (const ThreadData& td)
 	{
@@ -331,14 +308,12 @@ class ThreadData
 	{ return _completionMessage; }
 
 	/**
-	 * @param	Status de terminaison de la tâche : true (succès) ou false
-	 *			(échec).
+	 * @param	Status de terminaison de la tâche : true (succès) ou false (échec).
 	 * @param	Message sur l'accomplissement de la tâche.
 	 * @see		hasSucceeded
 	 * @see		getCompletionMessage
 	 */
-	virtual void setCompletionStatus (
-							bool success, const IN_STD string& msg = "")
+	virtual void setCompletionStatus (bool success, const IN_STD string& msg = "")
 	{
 		_success			= success;
 		_completionMessage	= msg;
@@ -356,14 +331,10 @@ class ThreadData
 
 
 /**
- * <P>Classe de thread joignable véhiculant une structure de données utilisable
- * par la méthode <I>execute</I>. Cette structure de données peut notamment
- * véhiculer en retour un code d'erreur, en dérivant pas exemple de la classe
- * <I>ThreadData</I>.</P>
+ * <P>Classe de thread joignable véhiculant une structure de données utilisable par la méthode <I>execute</I>. Cette structure de données peut notamment
+ * véhiculer en retour un code d'erreur, en dérivant pas exemple de la classe <I>ThreadData</I>.</P>
  *
- * <P>Les données associées au thread sont à allouer dynamiquement par le
- * thread appelant, et leur destruction sont également à sa charge après la mort
- * du thread.
+ * <P>Les données associées au thread sont à allouer dynamiquement par le thread appelant, et leur destruction sont également à sa charge après la mort du thread.
  * </P>
  */
 template <class T> class ReportedJoinableThread : public JoinableThread
@@ -372,8 +343,7 @@ template <class T> class ReportedJoinableThread : public JoinableThread
 
 	/**
 	 * Constructeur.
-	 * @param		Données associées au thread. Ces données sont à la charge du
-	 *				thread appelant.
+	 * @param		Données associées au thread. Ces données sont à la charge du thread appelant.
 	 */
 	ReportedJoinableThread (T* data)
 		: JoinableThread ( ), _data (data)

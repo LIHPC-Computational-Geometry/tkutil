@@ -1,9 +1,11 @@
 set (CURRENT_PACKAGE_NAME "TkUtil")
 set (CURRENT_PACKAGE_MACRO_NAME "TK_UTIL")
 
+find_package (GUIToolkitsVariables)
+
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/workarounds.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/workarounds.cmake)
 
 find_package (Iconv REQUIRED)
 
@@ -18,6 +20,7 @@ add_library (TkUtil ${CPP_SOURCES} ${HEADERS})
 foreach (lib ${ALL_TARGETS})
    target_compile_options (${lib} PUBLIC ${MANDATORY_CXX_OPTIONS})
    target_compile_definitions (${lib} PRIVATE TOSTR_USES_CPP_IMPLEMENTATION)
+   target_compile_definitions (${lib} PRIVATE UTIL_VERSION="${TK_UTIL_VERSION}")
    set_property (TARGET ${lib} PROPERTY VERSION ${TK_UTIL_VERSION})
    set_property (TARGET ${lib} PROPERTY SOVERSION ${TK_UTIL_MAJOR_VERSION})
 # Etre capable une fois installée de retrouver les libs utilisées (iconv ?), ... :

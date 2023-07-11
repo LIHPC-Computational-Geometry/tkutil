@@ -1,7 +1,3 @@
-/**
- * # EXPURGE_BEGINNING_TAG HOWTO
- * EXPURGE_COMPLETION_TAG
- */
 #include <TkUtil/Exception.h>
 #include <TkUtil/File.h>
 #include <TkUtil/NetworkData.h>
