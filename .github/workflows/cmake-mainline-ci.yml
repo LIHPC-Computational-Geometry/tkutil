@@ -24,10 +24,17 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Clone GUIToolkitsVariables source code from GitHub
+      - name: Checkout guitoolkitsvariables source code from GitHub
+        uses: actions/checkout@v3
+        with:
+          repository: LIHPC-Computational-Geometry/guitoolkitsvariables
+          path: guitoolkitsvariables
+
+      - name: Build guitoolkitsvariables with Cmake
         shell: bash
         run: |
-          cd $INSTALL_DIR && git clone --depth=1 https://github.com/LIHPC-Computational-Geometry/guitoolkitsvariables.git
+          cmake -S $GITHUB_WORKSPACE/guitoolkitsvariables -B build/guitoolkitsvariables -DUSE_PYTHON_3:BOOL=ON --install-prefix=$INSTALL_DIR/guitoolkitsvariables
+          cmake --build build/guitoolkitsvariables --target install
 
       - name: Checkout ${{ github.event.repository.name }} source code from GitHub
         uses: actions/checkout@v3
