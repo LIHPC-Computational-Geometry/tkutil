@@ -24,11 +24,10 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Checkout GUIToolkitsVariables source code from GitHub
-        uses: actions/checkout@v3
-        with:
-          repository: LIHPC-Computational-Geometry/guitoolkitsvariables
-          path: $INSTALL_DIR/guitoolkitsvariables
+      - name: Clone GUIToolkitsVariables source code from GitHub
+        shell: bash
+        run: |
+          cd $INSTALL_DIR && git clone --depth=1 https://github.com/LIHPC-Computational-Geometry/guitoolkitsvariables.git
 
       - name: Checkout ${{ github.event.repository.name }} source code from GitHub
         uses: actions/checkout@v3
