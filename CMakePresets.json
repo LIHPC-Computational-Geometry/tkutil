@@ -5,7 +5,8 @@
         "name": "ci",
         "cacheVariables":
         {
-           "USE_PYTHON_3": "ON"
+            "GUIToolkitsVariables_ROOT": "$env{INSTALL_DIR}/guitoolkitsvariables",
+            "USE_PYTHON_3": "ON"
         }
       }
     ]

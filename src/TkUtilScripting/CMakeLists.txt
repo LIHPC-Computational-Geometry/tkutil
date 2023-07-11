@@ -1,10 +1,12 @@
 set (CURRENT_PACKAGE_NAME "TkUtilScripting")
 set (CURRENT_PACKAGE_MACRO_NAME "TK_UTIL_SCRIPTING")
 
+find_package (GUIToolkitsVariables)
+
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/common.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/python_binding.cmake)
-include (${CMAKE_SOURCE_DIR}/cmake/workarounds.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/workarounds.cmake)
 
 file (GLOB HEADERS public/${CURRENT_PACKAGE_NAME}/*.h)
 file (GLOB CPP_SOURCES *.i *.cpp)
@@ -28,7 +30,7 @@ swig_add_library (TkUtilScripting TYPE SHARED LANGUAGE PYTHON SOURCES ${CPP_SOUR
 cmake_policy (SET CMP0086 NEW)
 set_source_files_properties (TkUtilScripting.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties (TkUtilScripting.i PROPERTIES SWIG_MODULE_NAME TkUtil)
-add_custom_command (TARGET TkUtilScripting POST_BUILD COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/TkUtil.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py COMMAND cat ${CMAKE_SOURCE_DIR}/cmake/utf8-header.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py >> ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py)
+add_custom_command (TARGET TkUtilScripting POST_BUILD COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/TkUtil.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py COMMAND cat ${GUIToolkitsVariables_CMAKE_DIR}/utf8-header.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py >> ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py)
 # Objectif avoir les flags de compilation SWIG suivants :
 # -globals TkUtil -shadow -DIN_STD="std::" -DSWIG_FORBIDS_FINALIZATION -DIN_UTIL="TkUtil::" -DIN_STD="std::"
 # Ne marche pas sans le -c++ malgré les CPLUSPLUS ON avant le swig_add_library.
@@ -41,11 +43,7 @@ endif (SWIG_VERSION VERSION_GREATER 4)
 swig_link_libraries (TkUtilScripting PUBLIC TkUtil ${Python_LIBRARIES})
 target_include_directories (TkUtilScripting PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public>$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 foreach (lib ${ALL_TARGETS})
-if (USE_PYTHON_3)
-	target_include_directories (TkUtilScripting PRIVATE ${Python3_INCLUDE_DIRS})
-else (USE_PYTHON_3)
-	target_include_directories (TkUtilScripting PRIVATE ${Python2_INCLUDE_DIRS})
-endif (USE_PYTHON_3)
+   target_include_directories (TkUtilScripting PRIVATE ${Python_INCLUDE_DIRS})
    target_compile_options (${lib} PUBLIC ${MANDATORY_CXX_OPTIONS})
    set_property (TARGET ${lib} PROPERTY VERSION ${TK_UTIL_VERSION})
    set_property (TARGET ${lib} PROPERTY SOVERSION ${TK_UTIL_MAJOR_VERSION})
@@ -87,7 +85,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScriptingDistribution.h DESTINAT
 # On ajoute en tête du fichier généré par swig l'encoding utilisé car sinon ça ne passe pas forcément lors de son exécution. Pour ce on le renomme en binding.py, puis on
 # fait un cat entete.py binding.py dont la sortie standard devient TkUtilScripting.py que l'on installera alors.
 install (CODE "file (RENAME ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py)")
-install (CODE "execute_process (COMMAND cat ${CMAKE_SOURCE_DIR}/cmake/utf8-header.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py)")
+install (CODE "execute_process (COMMAND cat ${GUIToolkitsVariables_CMAKE_DIR}/utf8-header.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py)")
 # Recopie du fichier binding python (=> création de PYTHON_BINDING_DIR utilisé après par install) :
 install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py DESTINATION ${PYTHON_BINDING_DIR})
 # Le lien lib/_TkUtilScripting.so.x.y.z vers lib/python/site-packages/_TkUtilScripting.so.x.y.z n'est pas bon car ils ne sont plus dans le même répertoire ...

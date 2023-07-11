@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <sstream>
 
 // ATTENTION : sous SGI/g++ ces declarations doivent venir apres les 
 // en-tetes c++
@@ -122,6 +123,38 @@ Process::~Process ( )
 			break;
 		}
 }	// Process::~Process
+
+
+Process* Process::create (const string& cmdLine)	// v 6.2.0
+{
+	istringstream	stream (cmdLine);
+	string			exe;
+	stream >> exe;
+	if (true == stream.fail ( ))
+	{
+		UTF8String	error (charset);
+		error << "Impossibilité d'extraire le nom du processus depuis la ligne de commande \"" << cmdLine << "\".";
+		throw Exception (error);
+	}	// if (true == stream.fail ( ))
+	
+	Process*	process	= new Process (exe);
+	while (false == stream.eof ( ))
+	{
+		string	option;
+		stream >> option;
+		if (true == stream.fail ( ))
+		{
+			delete process;		process	= 0;
+			UTF8String	error (charset);
+			error << "Erreur lors de l'extraction d'une option de lancement du processus " << exe << " à partir de la ligne de commande \"" << cmdLine << "\".";
+			throw Exception (error);
+		}	// if (true == stream.fail ( ))
+
+		process->getOptions ( ).addOption (option);
+	}	// while (false == stream.eof ( ))
+	
+	return process;
+}	// Process::create
 
 
 Process::ProcessOptions& Process::getOptions ( )

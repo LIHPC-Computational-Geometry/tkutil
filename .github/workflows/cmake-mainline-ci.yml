@@ -1,0 +1,63 @@
+name: Cmake CI on mainline
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  QT_QPA_PLATFORM: offscreen
+
+jobs:
+  main:
+    name: CMake build & run mainline
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Linux, Windows or Mac.
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/lihpc-computational-geometry/cmake-cgcore:latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout guitoolkitsvariables source code from GitHub
+        uses: actions/checkout@v3
+        with:
+          repository: LIHPC-Computational-Geometry/guitoolkitsvariables
+          path: guitoolkitsvariables
+
+      - name: Build guitoolkitsvariables with Cmake
+        shell: bash
+        run: |
+          cmake -S $GITHUB_WORKSPACE/guitoolkitsvariables -B build/guitoolkitsvariables -DUSE_PYTHON_3:BOOL=ON --install-prefix=$INSTALL_DIR/guitoolkitsvariables
+          cmake --build build/guitoolkitsvariables --target install
+
+      - name: Checkout ${{ github.event.repository.name }} source code from GitHub
+        uses: actions/checkout@v3
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Build ${{ github.event.repository.name }} with Cmake
+        shell: bash
+        run: |
+          cmake -S $GITHUB_WORKSPACE/${{ github.event.repository.name }} -B build/${{ github.event.repository.name }} --preset=ci --install-prefix=$INSTALL_DIR/${{ github.event.repository.name }}
+          cmake --build build/${{ github.event.repository.name }} --target install
+
+      - name: Run ${{ github.event.repository.name }} unit tests
+        shell: bash
+        run: |
+          cmake --build build/${{ github.event.repository.name }} --target test
+
+      - name: Test of link on ${{ github.event.repository.name }}
+        shell: bash
+        run: |
+          cd ${{ github.event.repository.name }}/test_link/
+          cp ../CMakePresets.json .
+          # Do not use ${{ github.event.repository.name }}_ROOT variable: package names != project names (sometimes)
+          cmake -S . -B build --preset=ci -DCMAKE_PREFIX_PATH=$INSTALL_DIR/${{ github.event.repository.name }}
+          cmake --build build
+          cmake --build build --target test

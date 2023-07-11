@@ -23,11 +23,9 @@ BEGIN_NAMESPACE_UTIL
  * <P>
  * Il existe deux manières de l'utiliser selon la valeur donnée à l'argument de la méthode <I>execute</I> :<BR>
  * <UL>
- * <LI>En appelant la méthode <B>execute</B> avec <B>true</B> en argument, le 
- * processus se détruira alors automatiquement à la mort du processus fils
+ * <LI>En appelant la méthode <B>execute</B> avec <B>true</B> en argument, le processus se détruira alors automatiquement à la mort du processus fils
  * (<B>Depuis la v 4.4.0 l'instance de <I>Process</I> est marquée comme terminée mais n'est plus détruite),
- * <LI>En utilisant la méthode <B>execute</B> avec <B>false</B> en argument,
- * puis la méthode <B>wait</B>. Il convient alors de détruire explicitement  l'instance.
+ * <LI>En utilisant la méthode <B>execute</B> avec <B>false</B> en argument, puis la méthode <B>wait</B>. Il convient alors de détruire explicitement  l'instance.
  * </UL><BR>
  * Quelque soit le type d'utilisation cette classe est a <B>instancier dynamiquement</B> (new).
  * </P>
@@ -82,8 +80,7 @@ BEGIN_NAMESPACE_UTIL
  * }<BR>
  * </CODE><BR>
  * </P>
- * <P>Cette classe permet également de connaître le répertoire courrant de
- * l'application à l'aide de la méthode statique <I>getCurrentDirectory</I>.
+ * <P>Cette classe permet également de connaître le répertoire courrant de l'application à l'aide de la méthode statique <I>getCurrentDirectory</I>.
  * </P>
  * @warning		Attention, cette classe positionne une action sur SIGCHLD.
  * @author	Charles PIGNEROL, CEA/DAM/DSSI
@@ -150,6 +147,13 @@ class Process
 	 */
 	virtual ~Process ( );
 
+	/**
+	 * Créé une instance à partir de la ligne de commande transmise en argument (exécutable puis arguments).
+	 * @return		instance créée.
+	 * @todo		possibilité de déclarer des variables d'environnement avant l'exécutable avec la synatxe variable=valeur
+	 */ 
+	static Process* create (const std::string& cmdLine);	// v 6.2.0
+	
 	/**
 	 * @return		Les options du processus.
 	 */
