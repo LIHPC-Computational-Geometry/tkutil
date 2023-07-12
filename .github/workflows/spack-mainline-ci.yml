@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           source /spack/share/spack/setup-env.sh 
-          spack install ${{ github.event.repository.name }}@develop^guitoolkitsvariables@develop --test root
+          spack install --test root ${{ github.event.repository.name }}@develop^guitoolkitsvariables@develop
 
       - name: Test of link
         shell: bash
