@@ -1,13 +1,54 @@
-name: Spack CI
+name: Spack CI on ${{ github.ref }}
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - '**'
+    tags:
+      - '*'
   pull_request:
-    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  QT_QPA_PLATFORM: offscreen
 
 jobs:
-  call:
-    name: Call Spack reusable workflow
-    uses: LIHPC-Computational-Geometry/lihpccg-ci/.github/workflows/spack-reusable.yml@main
+  main:
+    name: Spack CI on ${{ github.ref }}
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Linux, Windows or Mac.
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/lihpc-computational-geometry/spack-cgcore:latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Spack build and install
+        shell: bash
+        run: |
+          source /spack/share/spack/setup-env.sh 
+          spack install --test=root ${{ github.event.repository.name }} @git.${{ github.ref}}
+
+      - name: Checkout source code for test of link 
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Test of link
+        shell: bash
+        run: |
+          source /spack/share/spack/setup-env.sh
+          spack load ${{ github.event.repository.name }}
+          cd test_link/
+          cmake -S . -B build
+          cmake --build build
+          cmake --build build --target test
+
+      - name: Archive test of link logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-of-link-logs
+          path: /__w/${{ github.event.repository.name }}/${{ github.event.repository.name }}/test_link/build/Testing/Temporary/LastTest.log
