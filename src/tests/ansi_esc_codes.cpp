@@ -18,6 +18,8 @@ int main (int argc, char* argv[])
 {
 	try 
 	{
+				throw Exception ("Test");
+
 		static const char*	asciiLine	= "La ligne test avec encodage  ASCII.";
 		cout << AnsiEscapeCodes::reset;
 		cout << "On efface complement l'ecran => cette ligne doit disparaitre." << endl;
