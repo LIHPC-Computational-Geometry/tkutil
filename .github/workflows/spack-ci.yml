@@ -7,7 +7,7 @@ on:
     tags:
       - '*'
   pull_request:
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually
   workflow_dispatch:
 
 jobs:
