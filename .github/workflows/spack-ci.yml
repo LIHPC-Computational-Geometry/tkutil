@@ -13,4 +13,4 @@ on:
 jobs:
   call:
     name: Call Spack reusable workflow
-    uses: LIHPC-Computational-Geometry/tkutil/.github/workflows/spack-reusable.yml@newci
+    uses: LIHPC-Computational-Geometry/lihpccg-ci/.github/workflows/spack-reusable.yml@main
