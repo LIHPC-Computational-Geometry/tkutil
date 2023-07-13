@@ -23,8 +23,8 @@ static void B (bool stdexc)
 {
 	try
 	{
-		A (stdexc);
 		throw Exception ("Test");
+		A (stdexc);
 	}
 	catch (const Exception& exc)
 	{
