@@ -28,9 +28,9 @@ jobs:
           spack add python@3
           spack add py-pytest
           # add the product to test
-          echo Branche @git.${{ github.ref }}
-          echo spack add ${{ github.event.repository.name }} @git.${{ github.ref }}
-          spack add ${{ github.event.repository.name }} @git.${{ github.ref }}
+          echo Branche @git.${{ github.ref_name }}
+          echo spack add ${{ github.event.repository.name }} @git.${{ github.ref_name }}
+          spack add ${{ github.event.repository.name }} @git.${{ github.ref_name }}
           # install
           spack concretize
           spack install -v --test=root
