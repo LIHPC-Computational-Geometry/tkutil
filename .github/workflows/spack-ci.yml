@@ -28,7 +28,7 @@ jobs:
       - name: Spack build and install
         shell: bash
         run: |
-          source /spack/share/spack/setup-env.sh 
+          source /spack/share/spack/setup-env.sh
           spack install --test=root ${{ github.event.repository.name }} @git.${{ github.ref}}
 
       - name: Checkout source code for test of link 
