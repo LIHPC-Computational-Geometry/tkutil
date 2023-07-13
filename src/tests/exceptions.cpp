@@ -24,6 +24,7 @@ static void B (bool stdexc)
 	try
 	{
 		A (stdexc);
+		throw Exception ("Test");
 	}
 	catch (const Exception& exc)
 	{

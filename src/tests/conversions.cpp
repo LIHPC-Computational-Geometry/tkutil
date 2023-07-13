@@ -27,7 +27,7 @@ bool parseArgs (int argc, char* argv[])
 		if ((string ("-precision") == argv [i]) && (i < argc - 1))
 			precision	= NumericConversions::strToULong (argv [++i]);
 		else if ((string ("-integerPartNum") == argv [i]) && (i < argc - 1))
-			integerPartNum	= NumericConversions::strToULong (argv [++i])
+			integerPartNum	= NumericConversions::strToULong (argv [++i]);
 		else
 			toConvert.push_back (argv [i]);
 	}	// for (int i = 1; i < argc; i++)
