@@ -14,7 +14,7 @@ BEGIN_NAMESPACE_UTIL
 Version::Version (const string& version)
 	: m_major (0), m_minor (0), m_release (0)
 {
-	stringToValues (version, m_major, m_minor, m_release);
+	stringToValues (version, m_major, m_minor, m_release)
 }	// Version::Version
 
 
