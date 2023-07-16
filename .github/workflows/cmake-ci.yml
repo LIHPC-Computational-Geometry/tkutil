@@ -1,10 +1,10 @@
 name: Cmake CI
 
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
+#  push:
+#    branches:
+#      - '**'
+#  pull_request:
   # Allows you to run this workflow manually
   workflow_dispatch:
 
