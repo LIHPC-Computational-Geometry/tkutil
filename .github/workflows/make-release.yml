@@ -1,4 +1,4 @@
-name: Check version CI
+name: Make release
 
 on:
   push:
