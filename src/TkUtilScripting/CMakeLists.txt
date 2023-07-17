@@ -101,6 +101,13 @@ export (EXPORT ${CMAKE_PACKAGE_TARGETS_NAME} FILE ${CMAKE_PACKAGE_TARGETS_FILE} 
 set (INCLUDE_INSTALL_DIR include/)			# TkUtilScripting_INCLUDE_DIR avec TkUtilScriptingConfig.cmake.in
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})		# TkUtilScripting_LIB_DIR avec TkUtilScriptingConfig.cmake.in
 set (RUNTIME_INSTALL_DIR ${PYTHON_BINDING_DIR}/)	# TkUtilScripting_RUNTIME_DIR avec TkUtilScriptingConfig.cmake.in
+
+if (NOT USE_PYTHON_3)
+	set (REQUIRED_PYTHON Python2)
+else (NOT USE_PYTHON_3)
+	set (REQUIRED_PYTHON Python3)
+endif (NOT USE_PYTHON_3)
+
 # Création du fichier TkUtilScriptingConfig.cmake qui définira TkUtilScripting_INCLUDE_DIR, TkUtilScripting_LIB_DIR et TkUtilScripting_RUNTIME_DIR :
 configure_package_config_file (cmake/${CMAKE_PACKAGE_CONFIG_NAME}.cmake.in ${CMAKE_PACKAGE_CONFIG_FILE}
 	INSTALL_DESTINATION ${CMAKE_CMAKE_DIR}
