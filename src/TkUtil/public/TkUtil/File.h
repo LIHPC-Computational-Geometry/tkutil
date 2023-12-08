@@ -12,9 +12,8 @@ BEGIN_NAMESPACE_UTIL
 
 
 /**
- * Cette classe permet d'accéder à des informations propres à un
- * fichier.
- * @todo		Plein de choses !
+ * Cette classe permet d'accéder à des informations propres à un fichier.
+ * @todo	Plein de choses !
  * @author	Charles PIGNEROL, CEA/DAM/DSSI
  */
 class File
@@ -58,11 +57,20 @@ class File
 
 	/**
 	 * @return		Le répertoire contenant le fichier ou ".".
+	 * @see			getBaseName
 	 */
 	virtual File getPath ( ) const;
 
 	/**
+	 * @return		Le nom du fichier sans son extension (ex : "toto" pour "toto.txt").
+	 * @see			getExtension
+	 * @since		6.6.0
+	 */
+	const IN_STD string getBaseName ( ) const;
+	
+	/**
 	 * @return		L'extension du fichier (ex : "txt" pour "toto.txt").
+	 * @see			getBaseName
 	 */
 	const IN_STD string getExtension ( ) const;
 
@@ -103,15 +111,13 @@ class File
 	virtual bool isReadable ( ) const;
 
 	/**
-	 * @return		true si le fichier est accessible en écriture, sinon
-	 *				false. Si le fichier n'existe pas les droits en
+	 * @return		true si le fichier est accessible en écriture, sinon false. Si le fichier n'existe pas les droits en
 	 *				écriture sont testés sur son répertoire.
 	 */
 	virtual bool isWritable ( ) const;
 
 	/**
-	 * @return		true si le fichier est accessible en exécution, sinon
-	 *				false.
+	 * @return		true si le fichier est accessible en exécution, sinon false.
 	 */
 	virtual bool isExecutable ( ) const;
 
@@ -132,19 +138,15 @@ class File
 	virtual void setAccessRights (mode_t rigths);	// v 5.11.0
 	 
 	/**
-	 * Créé effectivement le fichier si celui-ci n'existe pas. Créé
-	 * l'arborescence parente si nécessaire.
-	 * @param		true si c'est un fichier, false si ce doit être un
-	 *				répertoire.
-	 * @exception	Une exception est levée en cas d'échec de la création du
-	 *				fichier.
+	 * Créé effectivement le fichier si celui-ci n'existe pas. Créé l'arborescence parente si nécessaire.
+	 * @param		true si c'est un fichier, false si ce doit être un répertoire.
+	 * @exception	Une exception est levée en cas d'échec de la création du fichier.
 	 */
 	virtual void create (bool asFile);
 
 	/**
 	 * Vide le fichier de son contenu.
-	 * @exception	Une exception est levée si le fichier n'existe pas, si c'est
-	 *				un répertoire ou en cas d'erreur.
+	 * @exception	Une exception est levée si le fichier n'existe pas, si c'est un répertoire ou en cas d'erreur.
 	 */
 	virtual void reset ( );
 
@@ -160,16 +162,13 @@ class File
 
 	/**
 	 * Détruit le fichier s'il existe.
-	 * @warning		<B>Si le fichier est un répertoire le contenu de celui-ci 
-	 *				est également détruit.</B>
-	 * @exception	Une exception est levée en cas d'échec de la destruction du
-	 *				fichier.
+	 * @warning		<B>Si le fichier est un répertoire le contenu de celui-ci est également détruit.</B>
+	 * @exception	Une exception est levée en cas d'échec de la destruction du fichier.
 	 */
 	virtual void remove ( );
 
 	/**
-	 * Affiche les informations sur le fichier dans le flux reçu en
-	 * argument.
+	 * Affiche les informations sur le fichier dans le flux reçu en argument.
 	 */
 	virtual void print (IN_STD ostream& stream) const;
 
@@ -182,9 +181,8 @@ class File
 	/**
 	 * Créé un nom unique de fichier temporaire.
 	 * @param		Préfix du nom de fichier temporaire.
-	 * @param		true si le fichier doit être créé dans le répertoire des
-	 *				fichiers temporaires, false si il doit être créé en relatif
-	 *				par rapport à prefix.
+	 * @param		true si le fichier doit être créé dans le répertoire des fichiers temporaires, 
+	 * 				false si il doit être créé en relatif par rapport à prefix.
 	 * @exception	Une exception est levée en cas d'échec.
 	 */
 	static IN_STD string createTemporaryName (const IN_STD string& prefix, bool inTmpDir = true);

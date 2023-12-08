@@ -69,7 +69,10 @@ void File::setFullFileName (const string& fullFileName)
 
 string File::getFileName ( ) const
 {
-	string::size_type	separator	= getFullFileName ( ).rfind ('/');
+	const string::size_type	separator	= getFullFileName ( ).rfind ('/');
+
+	if (0 == separator)
+		return string ("/");	// v 6.6.0, cf. man basename
 
 	if (string::npos == separator)
 		return getFullFileName ( );
@@ -80,13 +83,31 @@ string File::getFileName ( ) const
 
 File File::getPath ( ) const
 {
-	string::size_type	separator	= getFullFileName ( ).rfind ('/');
+	const string::size_type	separator	= getFullFileName ( ).rfind ('/');
 
+	if (0 == separator)
+		return string ("/");	// v 6.6.0, cf. man basename
+		
 	if (string::npos == separator)
 		return File (".");
 
 	return getFullFileName ( ).substr (0, separator);
 }	// File::getPath
+
+
+const string File::getBaseName ( ) const	// v 6.6.0
+{
+	const string			fileName	= getFileName ( );
+	const string::size_type	lastDot		= fileName.rfind ('.');
+
+	if ((1 == lastDot) && (fileName == ".."))
+		return fileName;
+		
+	if (string::npos == lastDot)
+		return fileName;
+
+	return 0 == lastDot ? string (".") : fileName.substr (0, lastDot);
+}	// File::getBaseName
 
 
 const string File::getExtension ( ) const
@@ -200,6 +221,7 @@ bool File::isSocket ( ) const
 
 	return false;
 }	// File::isSocket
+
 
 bool File::isReadable ( ) const
 {
@@ -470,8 +492,9 @@ void File::print (IN_STD ostream& stream) const
 
 	stream << "Nom complet             : " << getFullFileName ( ) << endl
 	       << "Nom                     : " << getFileName ( ) << endl
-	       << "Répertoire              : " << getPath ( ).getFullFileName ( )
-	       << endl
+	       << "Base                    : " << getBaseName ( ) << endl
+	       << "Extension               : " << getExtension ( ) << endl
+	       << "Répertoire              : " << getPath ( ).getFullFileName ( ) << endl
 	       << "Existe                  : "
 	       << (true == exist ? "oui" : "non") << endl;
 	if (true == exist)

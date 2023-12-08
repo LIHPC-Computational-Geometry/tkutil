@@ -28,7 +28,6 @@ set (ALL_TARGETS TkUtilScripting)
 set_property (SOURCE TkUtilScripting.i PROPERTY CPLUSPLUS ON)
 swig_add_library (TkUtilScripting TYPE SHARED LANGUAGE PYTHON SOURCES ${CPP_SOURCES})
 cmake_policy (SET CMP0086 NEW)
-set_source_files_properties (TkUtilScripting.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties (TkUtilScripting.i PROPERTIES SWIG_MODULE_NAME TkUtil)
 add_custom_command (TARGET TkUtilScripting POST_BUILD COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/TkUtil.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py COMMAND cat ${GUIToolkitsVariables_CMAKE_DIR}/utf8-header.py ${CMAKE_CURRENT_BINARY_DIR}/binding.py >> ${CMAKE_CURRENT_BINARY_DIR}/TkUtilScripting.py)
 # Objectif avoir les flags de compilation SWIG suivants :
