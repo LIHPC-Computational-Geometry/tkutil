@@ -1,3 +1,9 @@
+Version 6.6.1 : 13/12/23
+===============
+
+cmake_minimum_required (VERSION 3.15)	# CMP0094 (python sélectionné)
+
+
 Version 6.6.0 : 08/12/23
 ===============
 
