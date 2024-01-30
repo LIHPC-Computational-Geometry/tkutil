@@ -17,10 +17,8 @@ namespace TkUtil
 
 /**
  * <P>======================================================================</P>
- * <P><B>ATTENTION :</B> Classe en cours de développement et de mise au
- * point.</P>
- * <P>NE FONCTIONNE PAS avec icpc v 12. A priori OK avec icpc v 15 et 17,
- * gcc 4.4 et 6.2.
+ * <P><B>ATTENTION :</B> Classe en cours de développement et de mise au point.</P>
+ * <P>NE FONCTIONNE PAS avec icpc v 12. A priori OK avec icpc v 15 et 17, gcc 4.4 et 6.2.
  * </P>
  *
  * <P>REQUIERT AU MOINS :<BR>
@@ -60,9 +58,7 @@ class ThreadPool
 	public :
 
 	/**
-	 * Les taches à exécuter. Par défaut elles ne sont pas détruites en fin
-	 * d'exécution et peuvent entrer en concurrence avec n'importe quelle autre
-	 * tache.
+	 * Les taches à exécuter. Par défaut elles ne sont pas détruites en fin d'exécution et peuvent entrer en concurrence avec n'importe quelle autre tache.
 	 */
 	class TaskIfc
 	{
@@ -104,8 +100,7 @@ class ThreadPool
 		{ _toDelete	= del; }
 
 		/**
-		 * @return		Le drapeau de concurrence de cette tache. Deux taches
-		 *				dont un & sur ce drapeau est non nul ne doivent pas être
+		 * @return		Le drapeau de concurrence de cette tache. Deux taches dont un & sur ce drapeau est non nul ne doivent pas être
 		 *				exécutées concurremment.
 		 * @see			setConcurrencyFlag
 		 */
@@ -113,8 +108,7 @@ class ThreadPool
 		{ return _concurrencyFlag; }
 
 		/**
-		 * @param		Le nouveau drapeau de concurrence de cette tache. S'il 
-		 *				est nul cette tache peut s'exécuter en même temps que 
+		 * @param		Le nouveau drapeau de concurrence de cette tache. S'il est nul cette tache peut s'exécuter en même temps que 
 		 *				toute autre tache.
 		 * @see			getConcurrencyFlag
 		 */
@@ -122,8 +116,7 @@ class ThreadPool
 		{ _concurrencyFlag	= concurrencyFlag; }
 
 		/**
-		 * Méthode à surcharger et contenant le code à exécuter de la tache. Ne
-		 * fait rien par défaut.
+		 * Méthode à surcharger et contenant le code à exécuter de la tache. Ne fait rien par défaut.
 		 */
 		virtual void execute ( );
 
@@ -131,8 +124,7 @@ class ThreadPool
 		protected :
 
 		/**
-		 * Méthode appelée par le gestionnaire (ou la tache) pour modifier le
-		 * status et son éventuel message associé.
+		 * Méthode appelée par le gestionnaire (ou la tache) pour modifier le status et son éventuel message associé.
 		 */
 		virtual void setStatus (STATUS status);
 		virtual void setStatus (STATUS status, const TkUtil::UTF8String& msg);
@@ -155,16 +147,14 @@ class ThreadPool
 
 	/**
 	 * Initialise cette classe.
-	 * @param		Nombre de taches à exécuter au maximum en concurrence. Si 0,
-	 *				prend le nombre de processeurs de la machine.
+	 * @param		Nombre de taches à exécuter au maximum en concurrence. Si 0, prend le nombre de processeurs de la machine.
 	 * @warning		Fonction à appeler avant toute utilisation de cette classe.
 	 */
 	static void initialize (size_t tasksNum = 0);
 
 	/**
 	 * Arrête le service de travailleurs et détruit le gestionnaire.
-	 * @warning		Ne plus utiliser cette classe après invocation de cette
-	 *				fonction.
+	 * @warning		Ne plus utiliser cette classe après invocation de cette fonction.
 	 */
 	static void finalize ( );
 	
@@ -173,13 +163,16 @@ class ThreadPool
 	 */
 	static ThreadPool& instance ( );
 
+
+	/** Le délai de répis en l'absence de tâche à exécuter (en nanosecondes). */
+	static size_t yieldDelay ( );				// v 6.7.0
+	static void setYieldDelay (size_t delay);	// v 6.7.0
+
 	/**
-	 * <P>Ajoute la tache transmise en argument à la liste des taches à
-	 * exécuter.
+	 * <P>Ajoute la tache transmise en argument à la liste des taches à exécuter.
 	 * </P>
 	 * @param		tache à effectuer
-	 * @param		<I>true</I> si le thread appelant attend la fin des taches
-	 * 				en cours via un appel à <I>barrier</I> (synchronisation),
+	 * @param		<I>true</I> si le thread appelant attend la fin des taches en cours via un appel à <I>barrier</I> (synchronisation),
 	 * 				et sera à débloquer.
 	 * @see			taskCompleted
 	 */
@@ -190,16 +183,14 @@ class ThreadPool
 	 * exécuter.
 	 * </P>
 	 * @param		taches à effectuer
-	 * @param		<I>true</I> si le thread appelant attend la fin des taches
-	 * 				en cours via un appel à <I>barrier</I> (synchronisation),
+	 * @param		<I>true</I> si le thread appelant attend la fin des taches en cours via un appel à <I>barrier</I> (synchronisation),
 	 * 				et sera à débloquer.
 	 * @see			taskCompleted
 	 */
 	void addTasks (const std::vector<TaskIfc*>& task, bool joinable = false);
 
 	/**
-	 * En retour des statistiques sur l'état d'avancement. C'est à l'appelant
-	 * de savoir à quoi comparer ...
+	 * En retour des statistiques sur l'état d'avancement. C'est à l'appelant de savoir à quoi comparer ...
 	 * @param		Le nombre de taches en cours de traitement
 	 * @param		Le nombre de taches en attente
 	 */
@@ -239,8 +230,7 @@ class ThreadPool
 	void stopWorkers ( );
 
 	/**
-	 * @return		Une tache a exécuter ou 0 s'il n'y en a pas (absence de
-	 * 				tache en file d'attente pouvant s'exécuter en concurrence
+	 * @return		Une tache a exécuter ou 0 s'il n'y en a pas (absence de tache en file d'attente pouvant s'exécuter en concurrence
 	 * 				avec celles en cours).
 	 * @see			taskCompleted
 	 */
@@ -265,14 +255,12 @@ class ThreadPool
 	 void deleteWorkers ( );
 
 	/**
-	 * Accepte de rejoindre le thread maître si aucune tache n'est en cours ou
-	 * file d'attente.
+	 * Accepte de rejoindre le thread maître si aucune tache n'est en cours ou file d'attente.
 	 */
 	void checkBarrier ( );
 
 	/**
-	 * @return		true si une tache dont le drapeau de concurrence transmis
-	 *				en argument peut être lancée, false dans le cas contraire.
+	 * @return		true si une tache dont le drapeau de concurrence transmis en argument peut être lancée, false dans le cas contraire.
 	 * @return		getNextTask
 	 */
 	bool validateConcurrency (size_t flag) const;
@@ -317,8 +305,7 @@ class ThreadPool
 	mutable std::mutex					_haltMutex;
 	bool								_halted;
 
-	/** Un point de rendez-vous sera il demandé pour les taches en cours ?
-	 * False par défaut. */
+	/** Un point de rendez-vous sera il demandé pour les taches en cours ? False par défaut. */
 	mutable std::mutex					_barrierMutex;
 	bool								_barrier;
 
@@ -334,12 +321,14 @@ class ThreadPool
 	/** Les travailleurs utilisés. */
 	IN_STD vector<WorkerThread*>		_workerThreads;
 
+	/** Le délai de répis en l'absence de tâche à exécuter (en nanosecondes). */
+	static size_t						_yieldDelay;		// v 6.7.0
+
 	/** Le mutex de protection des taches. */
 	mutable std::mutex					_tasksMutex;
 	std::condition_variable				_tasksCond;
 
-	/** L'arrivée d'une tache => reveiller au moins un travailleur si
-	 * necessaire. */
+	/** L'arrivée d'une tache => reveiller au moins un travailleur si nécessaire. */
 	std::mutex							_wakeUpCondMutex;
 	std::condition_variable				_wakeUpCond;
 
@@ -365,8 +354,7 @@ class ThreadPool
 		~WorkerThread ( );
 
 		/**
-		 * La boucle d'attente/accomplissement de taches. Ces taches sont
-		 * récupérées auprès du gestionnaire de travailleurs.
+		 * La boucle d'attente/accomplissement de taches. Ces taches sont récupérées auprès du gestionnaire de travailleurs.
 		 */
 		void execute ( );
 

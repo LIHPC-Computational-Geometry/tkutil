@@ -22,21 +22,18 @@ static const Charset	charset ("àéèùô");
 // ============================================================================
 
 ThreadPool::TaskIfc::TaskIfc ( )
-	: _status (ThreadPool::TaskIfc::WAITING), _message ( ), _toDelete (false),
-	  _concurrencyFlag (0)
+	: _status (ThreadPool::TaskIfc::WAITING), _message ( ), _toDelete (false), _concurrencyFlag (0)
 {
 }	// TaskIfc::TaskIfc
 
 
 ThreadPool::TaskIfc::TaskIfc (const ThreadPool::TaskIfc& task)
-	: _status (task._status), _message (task._message),
-	  _toDelete (task._toDelete), _concurrencyFlag (0)
+	: _status (task._status), _message (task._message), _toDelete (task._toDelete), _concurrencyFlag (0)
 {
 }	// TaskIfc::TaskIfc
 
 
-ThreadPool::TaskIfc& ThreadPool::TaskIfc::operator = (
-											const ThreadPool::TaskIfc& task)
+ThreadPool::TaskIfc& ThreadPool::TaskIfc::operator = (const ThreadPool::TaskIfc& task)
 {
 	if (&task != this)
 	{
@@ -78,10 +75,8 @@ void ThreadPool::TaskIfc::setStatus (STATUS status, const UTF8String& msg)
 // ============================================================================
 
 ThreadPool::WorkerThread::WorkerThread ( )
-	: _thread (0), _task (0), _haltMutex ( ), _halted (false),
-	  _completed (false)
-{	// Rem : les bouléens _halted et _barrier ne sont pas initialisés
-	// ici pour éviter des accès concurrents détectés par intel inspector.
+	: _thread (0), _task (0), _haltMutex ( ), _halted (false), _completed (false)
+{	// Rem : les bouléens _halted et _barrier ne sont pas initialisés ici pour éviter des accès concurrents détectés par intel inspector.
 	// Ils seront initialisés dans execute.
 }	// WorkerThread::WorkerThread
 
@@ -93,8 +88,7 @@ ThreadPool::WorkerThread::WorkerThread (const ThreadPool::WorkerThread&)
 }	// WorkerThread::WorkerThread
 
 
-ThreadPool::WorkerThread& ThreadPool::WorkerThread::operator = (
-											const ThreadPool::WorkerThread&)
+ThreadPool::WorkerThread& ThreadPool::WorkerThread::operator = (const ThreadPool::WorkerThread&)
 {
 	assert (0 && "WorkerThread assignment operator is not allowed.");
 
@@ -133,7 +127,13 @@ void ThreadPool::WorkerThread::execute ( )
 
 		if (0 == _task)
 		{
-			this_thread::yield ( );
+//cout << "Worker " << (unsigned long)this << " WAITS " << yieldDelay ( ) << " nanoseconds ..." << endl;
+			const size_t	delay	= ThreadPool::yieldDelay ( );
+			if (0 == delay)
+				this_thread::yield ( );
+			else
+				this_thread::sleep_for (std::chrono::nanoseconds (delay));	// v 6.7.0
+//cout << "Worker " << (unsigned long)this << " HAS WAITED." << endl;
 		}	// if (0 == _task)
 		else
 		{
@@ -229,21 +229,19 @@ void ThreadPool::WorkerThread::join ( )
 
 ThreadPool*			ThreadPool::_instance	= 0;
 bool				ThreadPool::_completed	= true;		// !running
-
+size_t				ThreadPool::_yieldDelay	= 100000;		// v 6.7.0 - 1 milliseconde
 
 ThreadPool::ThreadPool (size_t tasksNum)
 	: _thread (0), _tasksNum (tasksNum), 
 	  _queuedTasks ( ), _runningTasks ( ), _deadTasks ( ), _workerThreads ( ),
 	  _tasksMutex ( ), _tasksCond ( ), _wakeUpCondMutex ( ), _barrierCondMutex ( )
-{	// Rem : les bouléens _halted et _barrier ne sont pas initialisés
-	// ici pour éviter des accès concurrents détectés par intel inspector.
+{	// Rem : les bouléens _halted et _barrier ne sont pas initialisés ici pour éviter des accès concurrents détectés par intel inspector.
 	// Ils seront initialisés dans init.
 }	// ThreadPool::ThreadPool
 
 
 ThreadPool::ThreadPool (const ThreadPool&)
-	: _thread (0), _tasksNum (0), _haltMutex ( ),
-	  _queuedTasks ( ), _runningTasks ( ), _deadTasks ( ), _workerThreads ( ),
+	: _thread (0), _tasksNum (0), _haltMutex ( ), _queuedTasks ( ), _runningTasks ( ), _deadTasks ( ), _workerThreads ( ),
 	  _tasksMutex ( ), _tasksCond ( ), _wakeUpCondMutex ( ), _barrierCondMutex ( )
 {
 	assert (0 && "ThreadPool copy constructor is not allowed.");
@@ -286,9 +284,7 @@ void ThreadPool::initialize (size_t tasksNum)
 	}	// if (__INTEL_COMPILER < 1500)
 #endif	// __INTEL_COMPILER
 
-	_instance	= new ThreadPool (
-				0 == tasksNum ?
-				MachineData::instance ( ).getProcessorsNum ( ) : tasksNum);
+	_instance	= new ThreadPool (0 == tasksNum ? MachineData::instance ( ).getProcessorsNum ( ) : tasksNum);
 	CHECK_NULL_PTR_ERROR (_instance)
 
 	// Création/mise en service des travailleurs :
@@ -321,6 +317,18 @@ ThreadPool& ThreadPool::instance ( )
 }	// ThreadPool::instance
 
 
+size_t ThreadPool::yieldDelay ( )	// v 6.7.0
+{
+	return _yieldDelay;
+}	// ThreadPool::yieldDelay
+
+
+void ThreadPool::setYieldDelay (size_t delay)	// v 6.7.0
+{
+	_yieldDelay	= delay;
+}	// ThreadPool::setYieldDelay
+
+
 void ThreadPool::stop ( )
 {
 	unique_lock<mutex>	haltLock (_haltMutex);
@@ -331,8 +339,7 @@ void ThreadPool::stop ( )
 void ThreadPool::stopWorkers ( )
 {
 	// On demande l'arrêt des travailleurs. */
-	for (vector<WorkerThread*>::iterator itw1 = _workerThreads.begin ( );
-	     _workerThreads.end ( ) != itw1; itw1++)
+	for (vector<WorkerThread*>::iterator itw1 = _workerThreads.begin ( ); _workerThreads.end ( ) != itw1; itw1++)
 		(*itw1)->stop ( );
 
 	// On attend l'arrêt des travailleurs. */
@@ -346,8 +353,7 @@ void ThreadPool::stopWorkers ( )
 	bool	completed	= false;
 	while (false == completed)
 	{
-		// Pour une raison inconnue le réveil ci-dessus ne fonctionne pas
-		// toujours bien, on remet donc ici une couche tant que tous les threads
+		// Pour une raison inconnue le réveil ci-dessus ne fonctionne pas toujours bien, on remet donc ici une couche tant que tous les threads
 		// ne sont pas achevés.
 		// 12/2017 - gcc 4.4.6
 		{
@@ -356,14 +362,12 @@ void ThreadPool::stopWorkers ( )
 		}
 		this_thread::yield ( );
 		completed	= true;
-		for (vector<WorkerThread*>::iterator itw3 = _workerThreads.begin ( );
-		     _workerThreads.end ( ) != itw3; itw3++)
+		for (vector<WorkerThread*>::iterator itw3 = _workerThreads.begin ( ); _workerThreads.end ( ) != itw3; itw3++)
 			if (false == (*itw3)->completed ( ))
 				completed	= false;
 	}	// while (false == completed)
 
-	for (vector<WorkerThread*>::iterator itw2 = _workerThreads.begin ( );
-	     _workerThreads.end ( ) != itw2; itw2++)
+	for (vector<WorkerThread*>::iterator itw2 = _workerThreads.begin ( ); _workerThreads.end ( ) != itw2; itw2++)
 		(*itw2)->join ( );
 }	// ThreadPool::stopWorkers
 
@@ -386,8 +390,7 @@ void ThreadPool::addTask (ThreadPool::TaskIfc& task, bool barrier)
 }	// ThreadPool::addTask (ThreadIfc* thread)
 
 
-void ThreadPool::addTasks (
-					const vector<ThreadPool::TaskIfc*>& tasks, bool barrier)
+void ThreadPool::addTasks (const vector<ThreadPool::TaskIfc*>& tasks, bool barrier)
 {
 	unique_lock<mutex>	tasksLock (_tasksMutex);
 	unique_lock<mutex>	barrierLock (_barrierMutex);
@@ -484,8 +487,7 @@ void ThreadPool::execute ( )
 	}
 
 	// On met les travailleurs en marche. */
-	for (vector<WorkerThread*>::iterator itw1 = _workerThreads.begin ( );
-	     _workerThreads.end ( ) != itw1; itw1++)
+	for (vector<WorkerThread*>::iterator itw1 = _workerThreads.begin ( ); _workerThreads.end ( ) != itw1; itw1++)
 		(*itw1)->start ( );
 
 	// La boucle d'exécution du gestionnaire de travailleurs :
@@ -493,15 +495,19 @@ void ThreadPool::execute ( )
 	{
 		deleteDeadTasks ( );
 
-		this_thread::yield ( );
+//cout << "Worker " << (unsigned long)this << " WAITS " << yieldDelay ( ) << " nanoseconds ..." << endl;
+		if (0 == _yieldDelay)
+			this_thread::yield ( );
+		else
+			this_thread::sleep_for (std::chrono::nanoseconds (_yieldDelay));	// v 6.7.0
+//cout << "Worker " << (unsigned long)this << " HAS WAITED." << endl;
 
 		checkBarrier ( );
 
 		{	// Mise en sommeil si absence de travail :
 			unique_lock<mutex>	sleepLock (_tasksMutex);
 			// Pas de mutex sur _barrierCondMutex : volontaire
-			if ((false == _barrier) && (0 == _queuedTasks.size ( )) &&
-			    (0 == _runningTasks.size ( )))
+			if ((false == _barrier) && (0 == _queuedTasks.size ( )) && (0 == _runningTasks.size ( )))
 				_tasksCond.wait (sleepLock);
 		}
 
@@ -527,8 +533,7 @@ void ThreadPool::taskCompleted (ThreadPool::TaskIfc& task)
 		_deadTasks.push_back (&task);
 
 	bool	found	= false;
-	for (vector<ThreadPool::TaskIfc*>::iterator it =
-				_runningTasks.begin ( ); _runningTasks.end ( ) != it; it++)
+	for (vector<ThreadPool::TaskIfc*>::iterator it = _runningTasks.begin ( ); _runningTasks.end ( ) != it; it++)
 	{
 		if (&task == *it)
 		{
@@ -538,8 +543,7 @@ void ThreadPool::taskCompleted (ThreadPool::TaskIfc& task)
 		}	// if (&task == *it)
 	}	// for (vector<ThreadPool::TaskIfc*>::const_iterator it = ...
 
-	// On réveille les travailleurs s'ils étaient au chômage. Peut être y a t'il
-	// maintenant une tache pouvant être lancée en concurrence avec celles
+	// On réveille les travailleurs s'ils étaient au chômage. Peut être y a t'il maintenant une tache pouvant être lancée en concurrence avec celles
 	// actives :
 	unique_lock<mutex>	wakeUpCondLock (_wakeUpCondMutex);
 	_wakeUpCond.notify_all ( );
@@ -552,8 +556,7 @@ void ThreadPool::deleteDeadTasks ( )
 
 	try
 	{
-		for (vector<ThreadPool::TaskIfc*>::iterator it	= _deadTasks.begin ( );
-		     _deadTasks.end ( ) != it; it++)
+		for (vector<ThreadPool::TaskIfc*>::iterator it	= _deadTasks.begin ( ); _deadTasks.end ( ) != it; it++)
 			delete *it;
 		_deadTasks.clear ( );
 	}
@@ -571,8 +574,7 @@ void ThreadPool::deleteWorkers ( )
 	int	step	= 0;
 	while (false == _workerThreads.empty ( ))
 	{
-		for (vector<WorkerThread*>::iterator it = _workerThreads.begin ( );
-		     _workerThreads.end ( ) != it; it++)
+		for (vector<WorkerThread*>::iterator it = _workerThreads.begin ( ); _workerThreads.end ( ) != it; it++)
 		{
 			const bool	completed	= (*it)->completed ( );
 			if (true == completed)
@@ -617,8 +619,7 @@ bool ThreadPool::validateConcurrency (size_t flag) const
 	if (0 == flag)
 		return true;
 
-	for (vector<ThreadPool::TaskIfc*>::const_iterator it =
-				_runningTasks.begin ( ); _runningTasks.end ( ) != it; it++)
+	for (vector<ThreadPool::TaskIfc*>::const_iterator it = _runningTasks.begin ( ); _runningTasks.end ( ) != it; it++)
 		if (0 != ((*it)->getConcurrencyFlag ( ) & flag))
 			return false;
 
@@ -634,9 +635,7 @@ void ThreadPool::join ( )
 		_barrier	= true;
 	}
 
-	// Idem ThreadPool::stopWorkers : pour une raison inconnue le réveil ne
-	// fonctionne pas forcément du premier coup, on remet donc ici plusieurs
-	// couches.
+	// Idem ThreadPool::stopWorkers : pour une raison inconnue le réveil ne fonctionne pas forcément du premier coup, on remet donc ici plusieurs couches.
 	// 12/2017 - gcc 4.4.6
 //	for (int i = 0; i < 10; i++)
 	{
@@ -669,8 +668,7 @@ ThreadPool::TaskIfc* ThreadPool::getTask ( )
 
 		if (0 != _queuedTasks.size ( ))
 		{
-			for (deque<ThreadPool::TaskIfc*>::iterator it =
-						_queuedTasks.begin ( ); _queuedTasks.end ( ) != it; it++)
+			for (deque<ThreadPool::TaskIfc*>::iterator it = _queuedTasks.begin ( ); _queuedTasks.end ( ) != it; it++)
 			{
 				if (true == validateConcurrency ((*it)->getConcurrencyFlag ( )))
 				{
@@ -683,11 +681,11 @@ ThreadPool::TaskIfc* ThreadPool::getTask ( )
 		}	// if (0 != _queuedTasks.size ( ))
 	}
 
-	if (0 == task)
+/*	if (0 == task)		v 6.7.0 : appel à ThreadPool::getTask ( ) non bloquant
 	{
 		unique_lock<mutex>	wakeUpCondLock (_wakeUpCondMutex);
 		_wakeUpCond.wait (wakeUpCondLock);
-	}
+	}	*/
 
 	return task;
 }	// ThreadPool::getTask
