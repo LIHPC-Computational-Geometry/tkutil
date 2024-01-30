@@ -404,7 +404,10 @@ void ThreadPool::addTasks (const vector<ThreadPool::TaskIfc*>& tasks, bool barri
 
 	// On réveille les travailleurs s'ils étaient au chômage :
 	unique_lock<mutex>	wakeUpCondLock (_wakeUpCondMutex);
-	_wakeUpCond.notify_all ( );
+	if (1 == tasks.size ( ))
+		_wakeUpCond.notify_one ( );		// v 6.7.0
+	else
+		_wakeUpCond.notify_all ( );
 }	// ThreadPool::addTasks (ThreadIfc* thread)
 
 
@@ -546,7 +549,8 @@ void ThreadPool::taskCompleted (ThreadPool::TaskIfc& task)
 	// On réveille les travailleurs s'ils étaient au chômage. Peut être y a t'il maintenant une tache pouvant être lancée en concurrence avec celles
 	// actives :
 	unique_lock<mutex>	wakeUpCondLock (_wakeUpCondMutex);
-	_wakeUpCond.notify_all ( );
+//	_wakeUpCond.notify_all ( );
+	_wakeUpCond.notify_one ( );		// v 6.7.0
 }	// ThreadPool::taskCompleted
 
 
