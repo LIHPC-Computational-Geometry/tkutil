@@ -134,7 +134,7 @@ int main (int argc, char* argv[])
 			<< nbProcs << " processors." << endl;
 
 		ThreadPool::initialize (nbProcs / 3);
-	//	ThreadPool::initialize (2);
+		ThreadPool::setYieldDelay (0);			// v 6.7.0 => this_thread::yield ( ) calls
 		srand (time (NULL));
 
 		size_t						i	= 0;
@@ -231,7 +231,6 @@ int main (int argc, char* argv[])
 
 			delete *itt;
 		}	// for (vector<ThreadPool::TaskIfc*>::iterator itt =  tasks.begin ( );
-		
 
 		ThreadPool::finalize ( );
 	}
