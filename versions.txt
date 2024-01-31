@@ -1,5 +1,5 @@
-Version 6.7.0 beta : 30/01/24
-====================
+Version 6.7.0 : 30/01/24
+===============
 
 ThreadPool : ne pas mobiliser 100% du CPU en l'absence de tâche
 - ThreadPool::getTask ( ) non bloquante
