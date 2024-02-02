@@ -1,7 +1,14 @@
+Version 6.8.0a : 02/02/24
+================
+
+ThreadPool : attente passive (sans timeout) des taches à traiter.
+A EPROUVER.
+
+
 Version 6.7.0 : 30/01/24
 ===============
 
-ThreadPool : ne pas mobiliser 100% du CPU en l'absence de tâche
+ThreadPool : ne pas mobiliser 100% du CPU en l'absence de tache
 - ThreadPool::getTask ( ) non bloquante
 - Remplacement des this_thread::yield ( ) par des this_thread::sleep_for (delay) si delay != 0
 - Paramétrage du délai de répis via ThreadPool::setYieldDelay (delay)

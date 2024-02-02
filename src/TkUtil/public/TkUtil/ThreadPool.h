@@ -18,8 +18,6 @@ namespace TkUtil
 /**
  * <P>======================================================================</P>
  * <P><B>ATTENTION :</B> Classe en cours de développement et de mise au point.</P>
- * <P>NE FONCTIONNE PAS avec icpc v 12. A priori OK avec icpc v 15 et 17, gcc 4.4 et 6.2.
- * </P>
  *
  * <P>REQUIERT AU MOINS :<BR>
  * - -std=c++0x
@@ -27,20 +25,14 @@ namespace TkUtil
  * </P>
  * <P>======================================================================</P>
  *
- * <P>Cette classe permet de gérer un ensemble de <B>threads</B> exécutants des
- * taches. Ils sont de ce fait appelés <I>travailleurs</I>. Elle lance
- * simultanément autant de threads que nécessaire et possible, chaque
- * travailleur prenant en charge une tache à exécuter. Une fois sa tache
- * exécutée le travailleur redevient disponible et reprend une tache s'il y
- * en a de disponible et pouvant s'exécuter en concurrence de celles en cours.
- * En l'absence de tache le travailleur se met en sommeil. Il est réveillé par 
- * gestionnaire lorsque de nouvelles taches lui sont confiées.
+ * <P>Cette classe permet de gérer un ensemble de <B>threads</B> exécutants des taches. Ils sont de ce fait appelés <I>travailleurs</I>. Elle lance
+ * simultanément autant de threads que nécessaire et possible, chaque travailleur prenant en charge une tache à exécuter. Une fois sa tache
+ * exécutée le travailleur redevient disponible et reprend une tache s'il y en a de disponible et pouvant s'exécuter en concurrence de celles en cours.
+ * En l'absence de tache le travailleur se met en sommeil. Il est réveillé par gestionnaire lorsque de nouvelles taches lui sont confiées.
  * </P>
- * <P>La fonction <I>barrier</I> de la classe <I>ThreadPool</I> permet de se
- * <B>synchroniser</B> avec la fin d'exécution des taches confiées.
+ * <P>La fonction <I>barrier</I> de la classe <I>ThreadPool</I> permet de se <B>synchroniser</B> avec la fin d'exécution des taches confiées.
  * </P>
- * <P>Contrairement à la classe <I>ThreadManager</I> les threads sont en
- * quantité restreinte et réutilisés, on fourni au gestionnaire des taches et
+ * <P>Contrairement à la classe <I>ThreadManager</I> les threads sont en quantité restreinte et réutilisés, on fourni au gestionnaire des taches et
  * non des threads.
  * </P>
  *
@@ -163,11 +155,6 @@ class ThreadPool
 	 */
 	static ThreadPool& instance ( );
 
-
-	/** Le délai de répis en l'absence de tâche à exécuter (en nanosecondes). */
-	static size_t yieldDelay ( );				// v 6.7.0
-	static void setYieldDelay (size_t delay);	// v 6.7.0
-
 	/**
 	 * <P>Ajoute la tache transmise en argument à la liste des taches à exécuter.
 	 * </P>
@@ -179,8 +166,7 @@ class ThreadPool
 	void addTask (TaskIfc& task, bool joinable = false);
 
 	/**
-	 * <P>Ajoute les taches transmises en argument à la liste des taches à
-	 * exécuter.
+	 * <P>Ajoute les taches transmises en argument à la liste des taches à  exécuter.
 	 * </P>
 	 * @param		taches à effectuer
 	 * @param		<I>true</I> si le thread appelant attend la fin des taches en cours via un appel à <I>barrier</I> (synchronisation),
@@ -244,8 +230,7 @@ class ThreadPool
 	void taskCompleted (TaskIfc&);
 
 	/**
-	 * Détruit les taches accomplies pour lesquelles <I>toDeleteAtCompletion</I>
-	 * retournait <I>true</I>.
+	 * Détruit les taches accomplies pour lesquelles <I>toDeleteAtCompletion</I> retournait <I>true</I>.
 	 */
 	 void deleteDeadTasks ( );
 
@@ -258,6 +243,15 @@ class ThreadPool
 	 * Accepte de rejoindre le thread maître si aucune tache n'est en cours ou file d'attente.
 	 */
 	void checkBarrier ( );
+	
+	/**
+	 * @return		La condition de répis/réveil des travailleurs et son mutex associé.
+	 * @since		6.8.0
+	 */
+	 std::condition_variable& getWakeUpCondition ( )
+	 { return _wakeUpCond; }
+	 std::mutex& getWakeUpCondMutex ( )
+	 { return _wakeUpCondMutex; }
 
 	/**
 	 * @return		true si une tache dont le drapeau de concurrence transmis en argument peut être lancée, false dans le cas contraire.
@@ -321,9 +315,6 @@ class ThreadPool
 	/** Les travailleurs utilisés. */
 	IN_STD vector<WorkerThread*>		_workerThreads;
 
-	/** Le délai de répis en l'absence de tâche à exécuter (en nanosecondes). */
-	static size_t						_yieldDelay;		// v 6.7.0
-
 	/** Le mutex de protection des taches. */
 	mutable std::mutex					_tasksMutex;
 	std::condition_variable				_tasksCond;
@@ -335,6 +326,7 @@ class ThreadPool
 	/** Les rendez-vous. */
 	std::mutex							_barrierCondMutex;
 	std::condition_variable				_barrierCond;
+	std::condition_variable				_joinCond;			// v 6.8.0
 
 	/**
 	 * Les travailleurs accomplissant les taches.
@@ -398,7 +390,7 @@ class ThreadPool
 		bool					_halted;
 
 		/** L'instance a t'elle fini de travailler ? */
-		mutable std::mutex		_completedMutex;	// not mandatory
+		mutable std::mutex		_completedMutex;
 		bool					_completed;
 	};	// class WorkerThread
 };	// class ThreadPool
