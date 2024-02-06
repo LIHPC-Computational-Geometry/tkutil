@@ -133,7 +133,9 @@ int main (int argc, char* argv[])
 		cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
 			<< nbProcs << " processors." << endl;
 
-		ThreadPool::initialize (nbProcs / 3);
+const size_t	nbWorkers	= nbProcs >= 48 ? 16 : nbProcs / 3;
+ThreadPool::initialize (nbWorkers / 3);
+//		ThreadPool::initialize (nbProcs / 3);
 		srand (time (NULL));
 
 		size_t						i	= 0;
