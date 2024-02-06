@@ -9,7 +9,6 @@ set (ALL_EXECUTABLES
    scripting_logs thread_manager thread_pool timer tmpfile
    unicode urlfifo user_representation userinfos utf8 utf8chars
    )
-set (ALL_EXECUTABLES thread_pool)
 set(CMAKE_CTEST_ARGUMENTS "--verbose")
 enable_testing()
 
