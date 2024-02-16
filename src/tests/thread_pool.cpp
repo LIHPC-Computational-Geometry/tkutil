@@ -129,12 +129,10 @@ int main (int argc, char* argv[])
 	try
 	{
 		const size_t	nbProcs	= MachineData::instance ( ).getProcessorsNum ( );
-
-		cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has "
-			<< nbProcs << " processors." << endl;
+		
+		cout << "Computer " << NetworkData::getCurrentHostName ( ) << " has " << nbProcs << " processors." << endl;
 
 		ThreadPool::initialize (nbProcs / 3);
-		ThreadPool::setYieldDelay (0);			// v 6.7.0 => this_thread::yield ( ) calls
 		srand (time (NULL));
 
 		size_t						i	= 0;
@@ -152,8 +150,7 @@ int main (int argc, char* argv[])
 			ThreadPool::instance ( ).addTask (*task, true);
 			ThreadPool::instance ( ).stats (running, queued);
 			message.clear ( );
-			message << "Progression : " << (max - running - queued) << "/"
-					<< max << "\n";
+			message << "Progression : " << (max - running - queued) << "/" << max << "\n";
 			pwriter->write (message.ascii ( ));
 		}	// for (i = 0; i < max; i++)
 		pwriter->write ("Joining tasks ...\n");
@@ -165,8 +162,7 @@ int main (int argc, char* argv[])
 		pwriter->write ("Joinable writing tasks with mutexes completed.\n\n");
 
 		message.clear ( );
-		message << "Creation of " << (unsigned long)max
-			<< " writing tasks with mutexes and concurrency flag ...\n";
+		message << "Creation of " << (unsigned long)max << " writing tasks with mutexes and concurrency flag ...\n";
 		pwriter->write (message.ascii ( ));
 		for (i = 0; i < max; i++)
 		{
@@ -176,20 +172,16 @@ int main (int argc, char* argv[])
 			ThreadPool::instance ( ).addTask (*task, true);
 			ThreadPool::instance ( ).stats (running, queued);
 			message.clear ( );
-			message << "Progression : " << (max - running - queued) << "/"
-				<< max << "\n";
+			message << "Progression : " << (max - running - queued) << "/" << max << "\n";
 			pwriter->write (message.ascii ( ));
 		}	// for (i = 0; i < max; i++)
 		pwriter->write ("Joining tasks ...\n");
 		ThreadPool::instance ( ).barrier ( );
 		ThreadPool::instance ( ).stats (running, queued);
 		message.clear ( );
-		message << "Progression : " << (max - running - queued) << "/" << max
-				<< "\n"
-				<< "Joinable writing tasks with mutexes and concurrency flag "
-				<< "completed.\n"
-				<< "Creation of " << (unsigned long)max << " writing tasks with "
-				<< "mutexes and concurrency flag and give them together ...\n";
+		message << "Progression : " << (max - running - queued) << "/" << max << "\n"
+				<< "Joinable writing tasks with mutexes and concurrency flag completed.\n"
+				<< "Creation of " << (unsigned long)max << " writing tasks with mutexes and concurrency flag and give them together ...\n";
 		pwriter->write (message.ascii ( ));
 		vector<ThreadPool::TaskIfc*>	tasks;
 		for (i = 0; i < max; i++)
@@ -200,8 +192,7 @@ int main (int argc, char* argv[])
 			tasks.push_back (task);
 			ThreadPool::instance ( ).stats (running, queued);
 			message.clear ( );
-			message << "Progression : " << (max - running - queued) << "/"
-					<< max << "\n";
+			message << "Progression : " << (max - running - queued) << "/" << max << "\n";
 			pwriter->write (message.ascii ( ));
 		}	// for (i = 0; i < max; i++)
 		ThreadPool::instance ( ).addTasks (tasks, true);
@@ -209,10 +200,8 @@ int main (int argc, char* argv[])
 		ThreadPool::instance ( ).barrier ( );
 		ThreadPool::instance ( ).stats (running, queued);
 		message.clear ( );
-		message << "Progression : " << (max - running - queued) << "/" << max
-				<< "\n"
-				<< "Joinable writing tasks with mutexes and concurrency flag "
-				<< "given together completed.\n";
+		message << "Progression : " << (max - running - queued) << "/" << max << "\n"
+				<< "Joinable writing tasks with mutexes and concurrency flag given together completed.\n";
 		pwriter->write (message.ascii ( ));
 
 		// On évalue les taches :
@@ -237,6 +226,11 @@ int main (int argc, char* argv[])
 	catch (const Exception& exc)
 	{
 		cout << "Exception caught : " << exc.getFullMessage ( ) << endl;
+		return -1;
+	}
+	catch (const exception& e)
+	{
+		cout << "Exception caught : " << e.what ( ) << endl;
 		return -1;
 	}
 	catch (...)

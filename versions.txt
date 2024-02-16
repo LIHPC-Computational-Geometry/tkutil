@@ -1,7 +1,15 @@
+Version 6.8.0 : 16/02/24
+================
+
+ThreadPool : attente passive des workers (sans timeout) des taches à traiter.
+
+NB : le test thread_pool est enlevé de la CI. Il ne fonctionne plus lorsque la CI est lancée par GitHub.
+
+
 Version 6.7.0 : 30/01/24
 ===============
 
-ThreadPool : ne pas mobiliser 100% du CPU en l'absence de tâche
+ThreadPool : ne pas mobiliser 100% du CPU en l'absence de tache
 - ThreadPool::getTask ( ) non bloquante
 - Remplacement des this_thread::yield ( ) par des this_thread::sleep_for (delay) si delay != 0
 - Paramétrage du délai de répis via ThreadPool::setYieldDelay (delay)
