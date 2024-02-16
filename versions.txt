@@ -1,8 +1,9 @@
-Version 6.8.0a : 02/02/24
+Version 6.8.0 : 16/02/24
 ================
 
-ThreadPool : attente passive (sans timeout) des taches à traiter.
-A EPROUVER.
+ThreadPool : attente passive des workers (sans timeout) des taches à traiter.
+
+NB : le test thread_pool est enlevé de la CI. Il ne fonctionne plus lorsque la CI est lancée par GitHub.
 
 
 Version 6.7.0 : 30/01/24
