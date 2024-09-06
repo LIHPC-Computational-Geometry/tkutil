@@ -68,6 +68,13 @@ class LocalNetwork
 	 * @see			isComputer
 	 */
 	static void initialize (const std::vector<HPComputer>& computerNames);	// v 5.9.0
+
+	/**
+	 * @return		Infos des calculateurs du réseau local.
+	 * @see			initialize
+	 * @see			isComputer
+	 */
+	static const std::vector<HPComputer>& getComputers ( );	// v 6.9.0
 	 
 	/**
 	 * @return		Informations sur le calculateur dont le nom est transmis en argument.
@@ -112,7 +119,9 @@ class LocalNetwork
 	
 	/**
 	 * @param		Nom de machine évalué.
-	 * @return		<I>true</I> si la machine est un calculateur, <I>false</I> dans le cas contraire.
+	 * @return		<I>true</I> si la machine est un calculateur, <I>false</I> dans le cas contraire. Est considéré comme calculateur
+	 * 				toute machine d recensée comme telle, toute machine dont le nom commence par un nom recensé, et toute machine
+	 * 				dont le nom contient celui reçu en argument.
 	 */
 	static bool isComputer (const IN_STD string& name);
 
@@ -143,14 +152,10 @@ class LocalNetwork
 	static IN_STD string getUserHome (const IN_STD string& computerName);
 
 	/**
-	 * Méthode pouvant être utilisée pour prévenir le lancement d'applications
-	 * X/GL sur des machines autres que celle de login (risque de plantage de
+	 * Méthode pouvant être utilisée pour prévenir le lancement d'applications  X/GL sur des machines autres que celle de login (risque de plantage de
 	 * station en cas d'incompatibilité).
-	 * @return		<I>true</I> si le processus tourne sur une machine autre
-	 *				que celle utilisée par l'utilisateur, <I>false</I> dans le
-	 *				cas contraire.
-	 * @warning		Méthodes de détection assez rudimentaires (SSH_CLIENT,
-	 * 				SSH_CONNECTION, DISPLAY).
+	 * @return		<I>true</I> si le processus tourne sur une machine autre que celle utilisée par l'utilisateur, <I>false</I> dans le cas contraire.
+	 * @warning		Méthodes de détection assez rudimentaires (SSH_CLIENT, SSH_CONNECTION, DISPLAY).
 	 */
 	static bool isRemoteHost ( );
 

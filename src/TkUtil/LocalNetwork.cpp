@@ -57,6 +57,12 @@ void LocalNetwork::initialize (const vector<LocalNetwork::HPComputer>& computers
 }	// LocalNetwork::initialize
 
 
+const vector<LocalNetwork::HPComputer>& LocalNetwork::getComputers ( )				// v 6.9.0
+{
+	return _computers;
+}	// LocalNetwork::getComputers
+
+
 LocalNetwork::HPComputer LocalNetwork::getComputerInfos (const string& name)		// v 5.9.0
 {
 	vector<LocalNetwork::HPComputer>::iterator it	= _computers.begin ( );
@@ -194,6 +200,8 @@ bool LocalNetwork::isComputer (const string& name)
 	for (vector<LocalNetwork::HPComputer>::const_iterator it = _computers.begin ( ); _computers.end ( ) != it; it++)
 	{
 		if (string::npos != (*it).name.find (name))
+			return true;
+		if (0 == name.find ((*it).name))	// v 6.9.0
 			return true;
 	}	// for (vector<LocalNetwork::HPComputer>::const_iterator it = _computers.begin ( ); _computers.end ( ) != it; it++)
 
