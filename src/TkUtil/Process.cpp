@@ -326,11 +326,12 @@ void Process::execute (bool autoDelete)
 int Process::wait ( )
 {
 	if (true == isCompleted ( ))
-	{
+		return getCompletionCode ( );		// v 6.10.0
+/*	{
 		UTF8String	errorMsg (charset);
 		errorMsg << "Impossibilité d'attendre la fin du processus " << getName ( ) << " : processus terminé.";
 		throw Exception (errorMsg);
-	}	// if (true == isCompleted ( ))
+	}	// if (true == isCompleted ( ))	*/
 	setWaited (true);
 	pid_t	childPid	= getPid ( );
 	int		status		= -1;
@@ -446,9 +447,7 @@ void Process::initialize (char* envp [])
 string Process::getChildLine ( )
 {
 	if ((true == isCompleted ( )) && (0 == _childBuffer.length ( )))
-	{	// v 2.21.0 : le remplissage du buffer n'est plus effectué dans
-		// childDeath (accès concurrents depuis la même pile aux fonctions de
-		// la lib malloc).
+	{	// v 2.21.0 : le remplissage du buffer n'est plus effectué dans childDeath (accès concurrents depuis la même pile aux fonctions de la lib malloc).
 		try
 		{
 			fillChildBuffer ( );

@@ -30,7 +30,7 @@ foreach (lib ${ALL_TARGETS})
 endforeach (lib)
 target_link_libraries (TkUtil PUBLIC ${Iconv_LIBRARIES})
 target_include_directories (TkUtil PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public>$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
-target_link_libraries (TkUtil PUBLIC pthread)
+target_link_libraries (TkUtil PUBLIC stdc++fs pthread)
 
 # INSTALLATION :
 include(CMakePackageConfigHelpers)

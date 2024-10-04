@@ -3,9 +3,9 @@ include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
 include (${GUIToolkitsVariables_CMAKE_DIR}/workarounds.cmake)
 
 set (ALL_EXECUTABLES
-   ansi_esc_codes canceled_threads conversions date exceptions
+   ansi_esc_codes canceled_threads conversions date dir_list exceptions
    fileExtractor fileinfos fileopts hostinfos joinable locale
-   logs memory modify_script remoteProcess removefile script_tags
+   logs memory modify_script process remoteProcess removefile script_tags
    scripting_logs thread_manager thread_pool timer tmpfile
    unicode urlfifo user_representation userinfos utf8 utf8chars
    )

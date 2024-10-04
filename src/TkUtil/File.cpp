@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <vector>
+#include <filesystem>
 
 
 USING_STD
@@ -243,6 +243,28 @@ bool File::isExecutable ( ) const
 {
 	return (0 == ::access (getFullFileName ( ).c_str ( ), X_OK) ? true : false);
 }	// File::isExecutable
+
+
+void File::getChildren (std::vector<File>& directories, std::vector<File>& files) const			// v 6.10.0
+{	// API C++ 17
+	directories.clear ( );
+	files.clear ( );
+	
+	if (false == isDirectory ( ))
+	{
+		UTF8String	message (charset);
+		message << "Impossibilité de donner la liste des sous-répertoires et fichiers : " << getFullFileName ( ) << " n'est pas un répertoire.";
+		throw Exception (message);
+	}	// if (false == isDirectory ( ))
+	
+	for (const auto& entry : filesystem::directory_iterator (getFullFileName ( )))
+	{
+		if (true == filesystem::is_directory (entry))
+			directories.push_back (File (filesystem::path (entry)));
+		else if (true == filesystem::is_regular_file (entry))
+			files.push_back (File (filesystem::path (entry)));
+	}	// for (const auto& entry : filesystem::directory_iterator (getFullFileName ( )))
+}	// File::getChildren
 
 
 mode_t File::getAccessRights ( ) const	// v 5.11.0

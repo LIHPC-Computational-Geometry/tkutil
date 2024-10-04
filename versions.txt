@@ -1,3 +1,14 @@
+Version 6.10.0 : 04/10/24
+=================
+
+Process::wait : correctif. Retourne getCompletionCode ( ) si déjà achevé à la place de lever une exception.
+Affecte des processus très brefs type "ls" dont on veut avoir un retour. Le programme test src/tests/process.cpp illustre un usage de ce type.
+
+Méthode File::getChildren retournant la liste des sous-répertoires et fichiers. Le programme test src/tests/dir_list.cpp illustre son usage.
+
+TkUtilScripting : retouches utilisation de swig (target_link_libraries, USE_SWIG_DEPENDENCIES).
+
+
 Version 6.9.0 : 06/09/24
 ================
 

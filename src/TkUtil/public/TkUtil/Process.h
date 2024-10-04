@@ -79,6 +79,30 @@ BEGIN_NAMESPACE_UTIL
  *		// ...<BR>
  * }<BR>
  * </CODE><BR>
+ * 3- Lecture de la sortie standard du processus lancé (cf. src/tests/process.cpp) :<BR>
+ * <CODE>
+ * unique_ptr<Process>	process (new Process ("ls"));
+ * process->getOptions ( ).addOption ("-al");
+ * process->getOptions ( ).addOption (argv [1]);
+ * cout << "Cmd line is : " << process->getCommandLine ( ) << endl;
+ * process->enableChildToSonCommunications (true);
+ * process->execute (false);
+ * const int	status	= process->wait ( );
+ * cout << "Process standard output :" << endl;
+ * bool	completed	= false;
+ * while (false == completed)
+ * {
+ *		try
+ * 		{
+ * 			const string	output	= process->getChildLine ( );
+ * 			cout << output << endl;
+ * 		}
+ * 		catch (...)
+ * 		{
+ * 			completed	= true;
+ * 		}
+ * }	// while (false == completed)
+ * </CODE><BR>
  * </P>
  * <P>Cette classe permet également de connaître le répertoire courrant de l'application à l'aide de la méthode statique <I>getCurrentDirectory</I>.
  * </P>
@@ -141,8 +165,7 @@ class Process
 	Process (const IN_STD string& processName);
 
 	/**
-	 * Destructeur : appelé automatiquement par l'instance en fin d'exécution 
-	 * si true est passé en argument d'<I>execute</I> .
+	 * Destructeur : appelé automatiquement par l'instance en fin d'exécution si true est passé en argument d'<I>execute</I> .
 	 * @see			execute
 	 */
 	virtual ~Process ( );
@@ -150,7 +173,7 @@ class Process
 	/**
 	 * Créé une instance à partir de la ligne de commande transmise en argument (exécutable puis arguments).
 	 * @return		instance créée.
-	 * @todo		possibilité de déclarer des variables d'environnement avant l'exécutable avec la synatxe variable=valeur
+	 * @todo		possibilité de déclarer des variables d'environnement avant l'exécutable avec la syntaxe variable=valeur
 	 */ 
 	static Process* create (const std::string& cmdLine);	// v 6.2.0
 	
@@ -160,8 +183,7 @@ class Process
 	virtual ProcessOptions& getOptions ( );
 
 	/**
-	 * @return			La ligne de commande complète qui sera exécutée. A des
-	 *					fins de débogage, méthode non utilisée par <I>execute</I>.
+	 * @return			La ligne de commande complète qui sera exécutée. A des fins de débogage, méthode non utilisée par <I>execute</I>.
 	 */
 	virtual IN_STD string getCommandLine ( );
 
@@ -173,8 +195,8 @@ class Process
 	virtual void execute (bool autoDelete = true);
 
 	/**
-	 * Attend la fin du processus fils.
-	 * @return		status de retour du processus fils.
+	 * Attend si nécessaire la fin du processus fils.
+	 * @return		status de retour du processus fils (<I>getCompletionCode ( )</I>).
 	 * @see			getCompletionCode
 	 * @see			getErrorMessage
 	 */
@@ -224,16 +246,12 @@ class Process
 	 * @see			getCompletionCode
 	 * @see			isCompleted
 	 */
-//	virtual const IN_STD string& getErrorMessage ( ) const	// v 4.4.0
-//	{ return _errorMessage; }
-	virtual const IN_STD string getErrorMessage ( ) const	// v 4.4.0
+	virtual const IN_STD string getErrorMessage ( ) const
 	{ return std::string (_errorMessage); }
 
 	/**
-	 * A invoquer si un pipe doit être ouvert de la sortie standard du
-	 * processus fils vers le processus père.
-	 * @param		true si la communication doit être en mode bloquant, false
-	 *				dans le cas contraire. Le mode non bloquant est irréversible.
+	 * A invoquer si un pipe doit être ouvert de la sortie standard du processus fils vers le processus père.
+	 * @param		true si la communication doit être en mode bloquant, false dans le cas contraire. Le mode non bloquant est irréversible.
 	 * @exception	Lève une exception en cas d'erreur
 	 * @see			getpipeDescriptors
 	 * @see			getChildLine
@@ -241,8 +259,7 @@ class Process
 	void enableChildToSonCommunications (bool blocking = true);
 
 	/**
-	 * @return		true si un pipe doit être ouvert de la sortie standard du
-	 *				processus fils vers le processus père.
+	 * @return		true si un pipe doit être ouvert de la sortie standard du processus fils vers le processus père.
 	 * @see			enableChildToSonCommunications
 	 */
 	bool isChildToSonCommunicationsEnabled ( ) const
@@ -279,8 +296,7 @@ class Process
 	 *				int main (int argc, char* argv[], char* envp [])
 	 * @warning		il est essentiel d'appeler cette fonction avant le lancement de tout process fils. En son absence
 	 *				il est possible que l'exécution du process fils  échoue.
-	 * @deprecated	Utiliser la version utilisant également <I>argc</I> et
-	 *				<I>argv</I> du main.
+	 * @deprecated	Utiliser la version utilisant également <I>argc</I> et <I>argv</I> du main.
 	 */
 	static void initialize (char* envp []);
 
@@ -303,8 +319,7 @@ class Process
 	 * @see			getCurrentSoftware
 	 * @see			getCurrentSoftwareVersion
 	 */
-	static void setCurrentSoftware (
-		const IN_STD string& name, const Version& version = Version ("0.0.0"));
+	static void setCurrentSoftware (const IN_STD string& name, const Version& version = Version ("0.0.0"));
 
 	/**
 	 * @return		Le nom du logiciel courrant, ou une chaine vide s'il n'a pas été renseigné par setCurrentSoftware.
@@ -342,20 +357,14 @@ class Process
 
 	/**
 	 * @param		Le message d'erreur associé à une terminaison anormale.
-	 * 				Sa recopie se limite aux PROCESS_ERROR_MESSAGE_SIZE-1
-	 * 				premiers caractères. Depuis la version 4.4.0 la gestion
-	 * 				du message d'erreur est géré dans un tampon pré-alloué car
-	 * 				ce message peut être issu d'un <I>signal émis</I> et recopié
-	 * 				dans un handler sur signal où il ne fait pas bon d'utiliser
-	 * 				malloc et free.
+	 * 				Sa recopie se limite aux PROCESS_ERROR_MESSAGE_SIZE-1 premiers caractères. Depuis la version 4.4.0 la gestion
+	 * 				du message d'erreur est géré dans un tampon pré-alloué car ce message peut être issu d'un <I>signal émis</I> et recopié
+	 * 				dans un handler sur signal où il ne fait pas bon d'utiliser malloc et free.
 	 */
-//	virtual void setErrorMessage (const IN_STD string& message)	// v 4.4.0
-//	{ _errorMessage	= message; }
-	virtual void setErrorMessage (const char* message);			// v 4.4.0
+	virtual void setErrorMessage (const char* message);	
 
 	/**
-	 * @return	True si la terminaison du processus fils est attendue,
-	 *			sinon false.
+	 * @return	True si la terminaison du processus fils est attendue, sinon false.
 	 * @see		setWaited
 	 * @see		waited
 	 */
@@ -371,9 +380,7 @@ class Process
 	{ _waited	= waited; }
 
 	/**
-	 * Lit les l'ensemble des données dans le pipe de communication avec
-	 * le processus fils et les stocke dans l'attente d'appels à 
-	 * getChildLine.
+	 * Lit les l'ensemble des données dans le pipe de communication avec le processus fils et les stocke dans l'attente d'appels à getChildLine.
 	 */
 	virtual void fillChildBuffer ( );
 
@@ -383,12 +390,11 @@ class Process
 	 * @param		Si true, ajoute un caractère de fin de ligne après
 	 *				la chaine.
 	 */
-	virtual void appendChildBuffer (
-							const IN_STD string& str, bool newLine = true);
+	virtual void appendChildBuffer (const IN_STD string& str, bool newLine = true);
 
 	/**
 	 * Appelé lorsqu'un processus fils est fini. Marque l'instance comme terminée.
-	 *i<B>Depuis la version 4.4.0 ne détruit plus l'instance associée si isWaited retourne false.</B>
+	 * <B>Depuis la version 4.4.0 ne détruit plus l'instance associée si isWaited retourne false.</B>
 	 * @param		nature du signal reçu.
 	 * @param		informations sur l'origine du signal
 	 * @param		contexte d'appel du signal
@@ -417,13 +423,10 @@ class Process
 	/** Le caractère "terminé" de l'instance. */
 	bool								_completed;
 
-	/** Vaut true si un pipe de communication doit être ouvert de la sortie
-	 * standard du processus fils vers le processus père. */
+	/** Vaut true si un pipe de communication doit être ouvert de la sortie standard du processus fils vers le processus père. */
 	bool								_childToSonCommunications;
 
-	/** Vaut true si les communications du processus fils vers le processus
-	 * père sont bloquantes, false dans le cas contraire. Vaut true par
-	 * défaut.
+	/** Vaut true si les communications du processus fils vers le processus père sont bloquantes, false dans le cas contraire. Vaut true par défaut.
 	 */
 	bool								_blockingCommunications;
 
@@ -447,8 +450,7 @@ class Process
 	int									_completionCode;
 
 	/** Le message d'erreur associé à une terminaison anormale. */
-//	IN_STD string						_errorMessage;			// v 4.4.0
-	char								_errorMessage [PROCESS_ERROR_MESSAGE_SIZE];// v 4.4.0
+	char								_errorMessage [PROCESS_ERROR_MESSAGE_SIZE];
 
 	/** La table comprenant les ids des tâches et les pointeurs sur les  instances associées de cette classe.
 	 */

@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ostream>
+#include <vector>
 
 
 BEGIN_NAMESPACE_UTIL
@@ -120,22 +121,30 @@ class File
 	 * @return		true si le fichier est accessible en exécution, sinon false.
 	 */
 	virtual bool isExecutable ( ) const;
+	
+	/**
+	 * @return		La liste des sous-répertoires (exception faite de "." et "..") et fichiers.
+	 * @exception	Une exception est levée en cas d'erreur, notamment si l'instance n'est pas un répertoire.
+	 * @since		6.10.0
+	 */
+	virtual void getChildren (std::vector<File>& directories, std::vector<File>& files) const;
 
 	/**
 	 * @return		Les droits d'accès sur le fichier (champ <I>st_mode</I> de la structure <I>stat</I>).
-	 *				Combinaison par opérateur | des flags S_IR*, S_IW*, S_IX*, * pouvant prendre pour 
-	 *				valeurs USR, GRP, OTH (cf. man chmod).
+	 *				Combinaison par opérateur | des flags S_IR*, S_IW*, S_IX*, * pouvant prendre pour valeurs USR, GRP, OTH (cf. man chmod).
 	 * @exception	Une exception est levée en cas d'erreur.
 	 * @see			setAccessRights
+	 * @since		5.11.0
 	 */
-	virtual mode_t getAccessRights ( ) const;		// v 5.11.0
+	virtual mode_t getAccessRights ( ) const;
 	 
 	/**
 	 * @param		Nouveaux droits d'accès sur le fichier (champ <I>st_mode</I> de la structure <I>stat</I>).
 	 * @exception	Une exception est levée en cas d'erreur.
 	 * @see			getAccessRights
+	 * @since		5.11.0
 	 */
-	virtual void setAccessRights (mode_t rigths);	// v 5.11.0
+	virtual void setAccessRights (mode_t rigths);
 	 
 	/**
 	 * Créé effectivement le fichier si celui-ci n'existe pas. Créé l'arborescence parente si nécessaire.
@@ -154,11 +163,11 @@ class File
 	 * Déplace physiquement le fichier.
 	 * @param		Nouveau path du fichier.
 	 * @param		Si <I>true</I> détruit l'éventuel fichier ayant le path demandé.
-	 * 				Si false et qu'un fichier existe déjà alors lève une exception.
+	 * 				Si <I>false</I> et qu'un fichier existe déjà alors lève une exception.
 	 * 	@exception	Une exception est levée en cas d'impossibilité de déplacer le fichier.
 	 * 	@see		setFullFileName
 	 */
-	 virtual void rename (const std::string& newpath, bool erase);	// v 5.4.0
+	virtual void rename (const std::string& newpath, bool erase);	// v 5.4.0
 
 	/**
 	 * Détruit le fichier s'il existe.
@@ -173,16 +182,14 @@ class File
 	virtual void print (IN_STD ostream& stream) const;
 
 	/**
-	 * @return		Le masque de permissions utilisé lors de la création de 
-	 *				fichiers.
+	 * @return		Le masque de permissions utilisé lors de la création de fichiers.
 	 */
 	static mode_t getUMask ( );
 
 	/**
 	 * Créé un nom unique de fichier temporaire.
 	 * @param		Préfix du nom de fichier temporaire.
-	 * @param		true si le fichier doit être créé dans le répertoire des fichiers temporaires, 
-	 * 				false si il doit être créé en relatif par rapport à prefix.
+	 * @param		true si le fichier doit être créé dans le répertoire des fichiers temporaires, false si il doit être créé en relatif par rapport à prefix.
 	 * @exception	Une exception est levée en cas d'échec.
 	 */
 	static IN_STD string createTemporaryName (const IN_STD string& prefix, bool inTmpDir = true);
