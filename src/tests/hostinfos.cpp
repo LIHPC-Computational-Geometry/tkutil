@@ -36,6 +36,7 @@ int main (int argc, char* argv [], char* envp[])
 	     << machine.getOperatingSystem ( ).getNumericInformations ( )
 	     << endl;
 	cout << "Machine virtuelle       : " << (true == machine.isVirtualMachine ( ) ? "oui" : "non") << endl;
+	cout << "Machine distante        : " << (true == machine.isRemoteHost ( ) ? "oui" : "non") << " (différente de celle de login via, par ex., ssh machine)" << endl;
 
 	if (argc <= 1)
 	{
