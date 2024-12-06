@@ -1,6 +1,6 @@
 include(CMakeFindDependencyMacro)
 find_dependency (TkUtil)
-find_dependency (@REQUIRED_PYTHON@ REQUIRED COMPONENTS Development)
+find_dependency (Python3 COMPONENTS Development)
 
 @PACKAGE_INIT@
 
