@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+set (TkUtil_VERSION @TK_UTIL_VERSION@)
+set_and_check (appstats_RUNTIME_DIR   "@PACKAGE_RUNTIME_INSTALL_DIR@")
+check_required_components (TkUtil)
+
