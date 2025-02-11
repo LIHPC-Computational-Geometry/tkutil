@@ -2,6 +2,7 @@
 #include "TkUtil/ApplicationStats.h"
 #include "TkUtil/Exception.h"
 #include "TkUtil/File.h"
+#include "TkUtil/NumericConversions.h"
 #include "TkUtil/UTF8String.h"
 
 #include <TkUtil/Date.h>
@@ -16,6 +17,7 @@
 #include <sys/file.h>	// flock
 #include <stdio.h>		// fopen, fseek, fscanf, fprintf
 #include <string.h>		// strerror
+#include <sys/stat.h>	// fchmod
 #include <sys/types.h>
 #include <unistd.h>		// fork, setsid
 
@@ -49,6 +51,15 @@ ApplicationStats::~ApplicationStats ( )
 }	// ApplicationStats::~ApplicationStats
 	
 
+string ApplicationStats::getFileName (const string& appName, const string& logDir, size_t month, size_t year)
+{
+	UTF8String	fileName (Charset::UTF_8);
+	fileName << logDir << "/" << appName << "_" << NumericConversions::toStr (year, 4) << NumericConversions::toStr (month, 2) << ".logs";
+
+	return fileName.utf8 ( );
+}	// ApplicationStats::getFileName
+
+	
 void ApplicationStats::logUsage (const string& appName, const string& logDir)
 {
 	// En vue de ne pas altérer le comportement de l'application tout est effectuée dans un processus fils.
@@ -81,11 +92,11 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	// Le nom du fichier :
 	const Date		date;
 	const string	user (UserData (true).getName ( ));
-	UTF8String	fileName;
-	fileName << logDir << "/" << appName << "_" << IN_UTIL setw (4) << date.getYear ( ) << setw (2) << (unsigned long)date.getMonth ( ) << ".logs";
+	UTF8String	fileName (getFileName (appName, logDir, (unsigned long)date.getMonth ( ), date.getYear ( )), Charset::UTF_8);
 
 	// On ouvre le fichier en lecture/écriture :
-	FILE* file	= fopen (fileName.utf8 ( ).c_str ( ), "r+");		// Ne créé pas le fichier => on le créé ci-dessous si nécessaire :
+	FILE* 		file	= fopen (fileName.utf8 ( ).c_str ( ), "r+");		// Ne créé pas le fichier => on le créé ci-dessous si nécessaire :
+	const bool	created	= NULL == file ? true : false;
 	file		= NULL == file ? fopen (fileName.utf8 ( ).c_str ( ), "a+") : file;
 	if (NULL == file)
 	{
@@ -134,6 +145,18 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 		fclose (file);
 		return;
 	}	// if (0 != flock (fd, LOCK_EX))
+	
+	// Conférer aufichier les droits en écriture pour tous le monde si il vient d'être créé :
+	if (true == created)
+	{
+		if (0 != fchmod (fd, S_IRWXU | S_IRWXG | S_IRWXO))
+		{
+			ConsoleOutput::cerr ( ) << "Erreur lors du confèrement à autrui des droits en écriture sur le fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+			fclose (file);
+			return;
+
+		}	// if (0 != fchmod (fd, S_IRWXU | S_IRWXG | S_IRWXO))
+	}	// if (true == created)
 
 	// Lecture et actualisation des logs existants :
 	map<string, size_t>		logs;
@@ -200,8 +223,111 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 		ConsoleOutput::cerr ( ) << "Erreur lors du déverrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
 		fclose (file);
-	}	// if (0 != flock (fd, LOCK_UN))	
+	}	// if (0 != flock (fd, LOCK_UN))
+	
+	fclose (file);
+	file	= NULL;
+	fd		= -1;
 }	// ApplicationStats::logUsage
+
+
+void ApplicationStats::logStats (std::ostream& output, const std::string& appName, const string& from, const string& to, const std::string& logDir)
+{
+	map<string, size_t> logs;
+	const size_t		fromMonth	= NumericConversions::strToULong (UTF8String (from).substring (0, 1));
+	const size_t		fromYear	= NumericConversions::strToULong (UTF8String (from).substring (2));
+	const size_t		toMonth		= NumericConversions::strToULong (UTF8String (to).substring (0, 1));
+	const size_t		toYear		= NumericConversions::strToULong (UTF8String (to).substring (2));
+
+	if (fromYear == toYear)
+	{
+		for (size_t m = fromMonth; m <= toMonth; m++)
+		{
+			cout << "Performing " << m << "/" << fromYear << endl;
+			UTF8String	fileName (getFileName (appName, logDir, m, fromYear), Charset::UTF_8);
+
+			if (0 != readLogs (fileName, logs))
+				ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		}	// for (size_t m = fromMonth; m <= toMonth; m++)
+	}	// if (fromYear == toYear)
+	else
+	{
+		for (size_t m = fromMonth; m <= 12; m++)
+		{
+			cout << "Performing " << m << "/" << fromYear << endl;
+			UTF8String	fileName (getFileName (appName, logDir, m, fromYear), Charset::UTF_8);
+
+			if (0 != readLogs (fileName, logs))
+				ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		}
+		for (size_t y = fromYear + 1; y < toYear; y++)
+			for (size_t m = 1; m <= 12; m++)
+			{
+				cout << "Performing " << m << "/" << y << endl;
+				UTF8String	fileName (getFileName (appName, logDir, m, y), Charset::UTF_8);
+
+				if (0 != readLogs (fileName, logs))
+					ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+			}
+		for (size_t m = 1; m <= toMonth; m++)
+		{
+			cout << "Performing " << m << "/" << toYear << endl;
+			UTF8String	fileName (getFileName (appName, logDir, m, toYear), Charset::UTF_8);
+
+			if (0 != readLogs (fileName, logs))
+				ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		}
+	}	// else if (fromYear == toYear)
+	
+	// On imprime les résultats dans le flux :
+	for (map<string, size_t>::const_iterator itl =  logs.begin ( ); logs.end ( ) != itl; itl++)
+		output << (*itl).first << "\t\t" << (*itl).second << endl;
+}	// ApplicationStats::logStats
+
+
+int ApplicationStats::readLogs (const string& fileName, map<string, size_t>& logs)
+{
+	File	logFile (fileName);
+	if (false == logFile.isReadable ( ))
+		return 0;
+
+	int	retval	= 0;
+	errno		= 0;
+	FILE*	file	= fopen (fileName.c_str ( ), "r");
+	if (NULL != file)
+	{
+		retval	= readLogs (*file, fileName, logs);
+		fclose (file);
+	}	// if (NULL != file)
+
+	return retval;
+}	// ApplicationStats::readLogs
+
+
+int ApplicationStats::readLogs (FILE& file, const string& fileName, map<string, size_t>& logs)
+{
+	errno			= 0;
+	size_t	line	= 1, count	= 0;
+	int		flag	= 0;
+	char	name [256];
+	while (2 == (flag = fscanf (&file, "%s\t%u", name, &count)))
+	{
+		line++;
+		map<string, size_t>::iterator	itl	= logs.find (name);
+		if (logs.end ( ) == itl)
+			logs.insert (pair<string, size_t> (name, count));
+		else
+			(*itl).second	+= count;
+		count	= 0;
+	}	// while (2 == fscanf (file, "%s\t%u", name, &count))
+	if ((flag < 2) && (EOF != flag))
+	{
+		ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : fichier probablement corrompu." << co_endl;
+		return -1;
+	}	// if (flag < 2)
+
+	return errno;
+}	// ApplicationStats::readLogs
 
 
 END_NAMESPACE_UTIL
