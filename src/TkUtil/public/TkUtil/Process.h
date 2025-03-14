@@ -11,6 +11,7 @@
 #include <siginfo.h>
 #endif	// !defined(__GNUC__) && !defined(__ia64__)
 
+#include <set>
 #include <vector>
 
 #define	PROCESS_ERROR_MESSAGE_SIZE		(1025)
@@ -286,7 +287,8 @@ class Process
 	 * @param		environnement d'execution (3eme argument du main de  l'application, où main est défini comme suit :
 	 *				int main (int argc, char* argv[], char* envp [])
 	 * @warning		il est essentiel d'appeler cette fonction avant le lancement de tout process fils. En son absence
-	 *				il est possible que l'exécution du process fils  échoue.
+	 *				il est possible que l'exécution du process fils échoue.
+	 * @see			finalize
 	 */
 	static void initialize (int argc, char* argv [], char* envp []);
 
@@ -299,6 +301,21 @@ class Process
 	 * @deprecated	Utiliser la version utilisant également <I>argc</I> et <I>argv</I> du main.
 	 */
 	static void initialize (char* envp []);
+
+	/**
+	 * Détruit tous les processus dont la destruction  a été confiée à cette classe. Ce peut être par exemple des processus
+	 * fils lancés via fork et non attendus.
+	 * @see			killAtEnd
+	 * @since		6.13.0
+	 */
+	static void finalize ( );
+	
+	/**
+	 * Délègue à cette classe le fait de tuer le processus de pid transmis en argument lorsque Process::finalize sera appelé.
+	 * @see			finalize
+	 * @since		6.13.0
+	 */
+	static void killAtEnd (pid_t tokill);
 
 	/**
 	 * @return		Le répertoire courrant de l'application, ou, en cas d'erreur, une chaine vide.
@@ -455,6 +472,12 @@ class Process
 	/** La table comprenant les ids des tâches et les pointeurs sur les  instances associées de cette classe.
 	 */
 	static IN_STD vector<Process*>		_tasks;
+	
+	/**
+	 * Les processus à tuer à lappel de finalize.
+	 * @see		killAtEnd
+	 */
+	static IN_STD set<pid_t>			_toKill;
 
 	/** Le nombre d'arguments de lancement de cette application. */
 	static int							_argc;
