@@ -1,3 +1,9 @@
+Version 6.13.0 : 14/03/25
+=================
+
+Possibilité de déléguer à la classe Process la destruction de processus en fin d'exécution via Process::killAtEnd () et Process::finalize ().
+
+
 Version 6.12.1 : 12/03/25
 =================
 

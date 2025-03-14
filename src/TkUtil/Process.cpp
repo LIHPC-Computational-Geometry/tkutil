@@ -1,3 +1,4 @@
+#include "TkUtil/AnsiEscapeCodes.h"
 #include "TkUtil/Process.h"
 #include "TkUtil/File.h"
 #include "TkUtil/UTF8String.h"
@@ -80,6 +81,7 @@ const vector<string>& Process::ProcessOptions::getOptions ( ) const
 // ===========================================================================
 
 vector<Process*>	Process::_tasks;
+set<pid_t>			Process::_toKill;
 int					Process::_argc	= 0;
 char**				Process::_argv	= 0;
 char**				Process::_envp	= 0;
@@ -442,6 +444,28 @@ void Process::initialize (char* envp [])
 {
 	_envp	= envp;
 }	// Process::initialize
+
+
+void Process::finalize ( )
+{
+	for (set<pid_t>::iterator itk = _toKill.begin ( ); _toKill.end ( ) != itk; itk++)
+	{
+		int	res	= ::kill (*itk, SIGKILL);
+		if (0 != res)
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Process::finalize. Erreur lors de l'appel à kill pour le processus de PID " << (unsigned long)*itk << " : " << strerror (errno) << co_endl;
+		}	// if (0 != res)
+	}	// for (set<pid_t>::iterator itk = _toKill.begin ( ); _toKill.end ( ) != itk; itk++)
+	
+	_toKill.clear ( );
+}	// Process::finalize
+
+
+void Process::killAtEnd (pid_t tokill)
+{
+	_toKill.insert (tokill);
+}	// Process::killAtEnd
 
 
 string Process::getChildLine ( )

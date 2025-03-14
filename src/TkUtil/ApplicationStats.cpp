@@ -3,6 +3,7 @@
 #include "TkUtil/Exception.h"
 #include "TkUtil/File.h"
 #include "TkUtil/NumericConversions.h"
+#include "TkUtil/Process.h"
 #include "TkUtil/UTF8String.h"
 
 #include <TkUtil/Date.h>
@@ -62,30 +63,38 @@ string ApplicationStats::getFileName (const string& appName, const string& logDi
 	
 void ApplicationStats::logUsage (const string& appName, const string& logDir)
 {
-	// En vue de ne pas altérer le comportement de l'application tout est effectuée dans un processus fils.
-	// Par ailleurs on quitte le processus fils par return et non exit pour passer dans le destructeur des variables automatiques créées (TermAutoStyle, ...).
+	// En vue de ne pas altérer le comportement de l'application tout est effectuée dans un processus fils => exit (0) en toutes circonstances.
 	errno	= 0;
 	const pid_t	pid	= fork ( );
 	if ((pid_t)-1 == pid)
 	{
+		TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
 		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : échec de fork : " << strerror (errno) << co_endl;
 		return;
 	}	// if ((pid_t)-1 == pid)
 	if (0 != pid)
+	{
+		Process::killAtEnd (pid);
 		return;	// Parent
+	}
 
 	// On détache complètement le fils du parent => peut importe qui fini en premier, l'autre ira jusqu'au bout :
 	const pid_t	sid	= setsid ( );
 	if ((pid_t)-1 == sid)
 	{
-		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : échec de setsid : " << strerror (errno) << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : échec de setsid : " << strerror (errno) << co_endl;
+		}
 		exit (0);
 	}	// if ((pid_t)-1 == sid)
 	
-	TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
 	if ((true == appName.empty ( )) || (true == logDir.empty ( )))
 	{
-		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : nom d'application ou répertoire des logs non renseigné (" << appName << "/" << logDir << ")." << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : nom d'application ou répertoire des logs non renseigné (" << appName << "/" << logDir << ")." << co_endl;
+		}
 		exit (0);
 	}	// if ((true == appName.empty ( )) || (true == logDir.empty ( )))
 
@@ -105,26 +114,38 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 			File	dir (logDir);
 			if ((false == dir.exists ( )) || (false == dir.isDirectory ( )) || (false == dir.isExecutable ( )) || (false == dir.isWritable ( )))
 			{
-				ConsoleOutput::cerr ( ) << "Erreur, " << logDir << " n'est pas un répertoire existant avec les droits en écriture pour vous." << co_endl;
+				{
+					TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+					ConsoleOutput::cerr ( ) << "Erreur, " << logDir << " n'est pas un répertoire existant avec les droits en écriture pour vous." << co_endl;
+				}
 				exit (0);
 			}	// if ((false == dir.exists ( )) || (false == dir.isDirectory ( )) || ...
 			File	logFile (fileName.utf8 ( ));
 			if (false == logFile.isWritable ( ))
 			{
-				ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : absence de droits en écriture." << co_endl;
+				{
+					TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+					ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : absence de droits en écriture." << co_endl;
+				}
 				exit (0);
 			}	// if (false == logFile.isWritable ( ))
 		}
 		catch (const Exception& exc)
 		{
-			ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : " << exc.getFullMessage ( ) << co_endl;
+			{
+				TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+				ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : " << exc.getFullMessage ( ) << co_endl;
+			}
 			exit (0);
 		}
 		catch (...)
 		{
 		}
 
-		ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : erreur non documentée." << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : erreur non documentée." << co_endl;
+		}
 
         exit (0);
 	}	// if (NULL == file)
@@ -133,7 +154,10 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	int	fd	= fileno (file);
 	if (-1 == fd)
 	{
-        ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << co_endl;
+		}
         exit (0);
 	}	// if (-1 == fd)
 
@@ -141,7 +165,10 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	errno	= 0;
 	if (0 != flock (fd, LOCK_EX))
 	{
-		ConsoleOutput::cerr ( ) << "Erreur lors du verrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors du verrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		}
 		fclose (file);
 		exit (0);
 	}	// if (0 != flock (fd, LOCK_EX))
@@ -151,7 +178,10 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 		if (0 != fchmod (fd, S_IRWXU | S_IRWXG | S_IRWXO))
 		{
-			ConsoleOutput::cerr ( ) << "Erreur lors du confèrement à autrui des droits en écriture sur le fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+			{
+				TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+				ConsoleOutput::cerr ( ) << "Erreur lors du confèrement à autrui des droits en écriture sur le fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+			}
 			fclose (file);
 			exit (0);
 
@@ -178,13 +208,19 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	}	// while (2 == fscanf (file, "%s\t%u", name, &count))
 	if (0 != errno)
 	{
-		ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : " << strerror (errno) << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : " << strerror (errno) << co_endl;
+		}
 		fclose (file);
 		exit (0);
 	}	// if (0 != errno)
 	else if ((flag < 2) && (EOF != flag))
 	{
-		ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : fichier probablement corrompu." << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : fichier probablement corrompu." << co_endl;
+		}
 		fclose (file);
 		exit (0);
 	}	// if (flag < 2)
@@ -195,7 +231,10 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	errno	= 0;
 	if (0 != fseek (file, 0, SEEK_SET))
 	{
-		ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		}
 		fclose (file);
 		exit (0);
 	}	// if (0 != fseek (file, 0, SEEK_SET))
@@ -204,7 +243,10 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 		if (fprintf (file, "%s\t%u\n", (*itl).first.c_str ( ), (*itl).second) < 0)
 		{
-			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << "."<< co_endl;
+			{
+				TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+				ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << "."<< co_endl;
+			}
 			fclose (file);
 			exit (0);
 		}
@@ -212,16 +254,22 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	errno	= 0;
 	if (0 != fflush (file))
 	{
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
 			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
-			fclose (file);
-			exit (0);
+		}
+		fclose (file);
+		exit (0);
 	}	// if (0 != fflush (file))
 	
 	// Libération du verrou :
 	errno	= 0;
 	if (0 != flock (fd, LOCK_UN))
 	{
-		ConsoleOutput::cerr ( ) << "Erreur lors du déverrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		{
+			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+			ConsoleOutput::cerr ( ) << "Erreur lors du déverrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
+		}
 		fclose (file);
 	}	// if (0 != flock (fd, LOCK_UN))
 	
