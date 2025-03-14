@@ -1,3 +1,10 @@
+Version 6.12.1 : 12/03/25
+=================
+
+Correctif ApplicationStats::logUsage : on sort systématiquement par exit (0). Des effets de bord indésirables ont été observés lors des poignées de main
+entre client et serveur omniORB.
+
+
 Version 6.12.0 : 11/02/25
 =================
 

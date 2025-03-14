@@ -79,14 +79,14 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	if ((pid_t)-1 == sid)
 	{
 		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : échec de setsid : " << strerror (errno) << co_endl;
-		return;
+		exit (0);
 	}	// if ((pid_t)-1 == sid)
 	
 	TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
 	if ((true == appName.empty ( )) || (true == logDir.empty ( )))
 	{
 		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : nom d'application ou répertoire des logs non renseigné (" << appName << "/" << logDir << ")." << co_endl;
-		return;
+		exit (0);
 	}	// if ((true == appName.empty ( )) || (true == logDir.empty ( )))
 
 	// Le nom du fichier :
@@ -106,19 +106,19 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 			if ((false == dir.exists ( )) || (false == dir.isDirectory ( )) || (false == dir.isExecutable ( )) || (false == dir.isWritable ( )))
 			{
 				ConsoleOutput::cerr ( ) << "Erreur, " << logDir << " n'est pas un répertoire existant avec les droits en écriture pour vous." << co_endl;
-				return;
+				exit (0);
 			}	// if ((false == dir.exists ( )) || (false == dir.isDirectory ( )) || ...
 			File	logFile (fileName.utf8 ( ));
 			if (false == logFile.isWritable ( ))
 			{
 				ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : absence de droits en écriture." << co_endl;
-				return;
+				exit (0);
 			}	// if (false == logFile.isWritable ( ))
 		}
 		catch (const Exception& exc)
 		{
 			ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : " << exc.getFullMessage ( ) << co_endl;
-			return;
+			exit (0);
 		}
 		catch (...)
 		{
@@ -126,7 +126,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 
 		ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : erreur non documentée." << co_endl;
 
-        return;
+        exit (0);
 	}	// if (NULL == file)
 
 	// Obtenir le descripteur de fichier :
@@ -134,7 +134,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	if (-1 == fd)
 	{
         ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << co_endl;
-        return;
+        exit (0);
 	}	// if (-1 == fd)
 
 	// Appliquer un verrou exclusif sur le fichier de logs :
@@ -143,7 +143,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 		ConsoleOutput::cerr ( ) << "Erreur lors du verrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
 		fclose (file);
-		return;
+		exit (0);
 	}	// if (0 != flock (fd, LOCK_EX))
 	
 	// Conférer aufichier les droits en écriture pour tous le monde si il vient d'être créé :
@@ -153,7 +153,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 		{
 			ConsoleOutput::cerr ( ) << "Erreur lors du confèrement à autrui des droits en écriture sur le fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
 			fclose (file);
-			return;
+			exit (0);
 
 		}	// if (0 != fchmod (fd, S_IRWXU | S_IRWXG | S_IRWXO))
 	}	// if (true == created)
@@ -180,13 +180,13 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 		ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : " << strerror (errno) << co_endl;
 		fclose (file);
-		return;
+		exit (0);
 	}	// if (0 != errno)
 	else if ((flag < 2) && (EOF != flag))
 	{
 		ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : fichier probablement corrompu." << co_endl;
 		fclose (file);
-		return;
+		exit (0);
 	}	// if (flag < 2)
 	if (false == found)
 		logs.insert (pair<string, size_t> (user, 1));
@@ -197,7 +197,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 		ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
 		fclose (file);
-		return;
+		exit (0);
 	}	// if (0 != fseek (file, 0, SEEK_SET))
 	
 	for (map<string, size_t>::const_iterator itl = logs.begin ( ); logs.end ( ) != itl; itl++)
@@ -206,7 +206,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 		{
 			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << "."<< co_endl;
 			fclose (file);
-			return;
+			exit (0);
 		}
 	}	// for (map<string, size_t>::const_iterator itl = logs.begin ( ); logs.end ( ) != itl; itl++)
 	errno	= 0;
@@ -214,7 +214,7 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	{
 			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
 			fclose (file);
-			return;
+			exit (0);
 	}	// if (0 != fflush (file))
 	
 	// Libération du verrou :
@@ -228,6 +228,8 @@ void ApplicationStats::logUsage (const string& appName, const string& logDir)
 	fclose (file);
 	file	= NULL;
 	fd		= -1;
+	
+	exit (0);
 }	// ApplicationStats::logUsage
 
 
