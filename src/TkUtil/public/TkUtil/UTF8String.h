@@ -210,18 +210,16 @@ class UTF8String
 {
 	public :
 
+#ifndef SWIG
 	friend UTF8String& operator << (UTF8String& u8str, Charset::CHARSET);
 	friend UTF8String& operator << (UTF8String& u8str, const Charset&);
 	friend UTF8String& operator << (UTF8String& u8str, setw width);
-	friend UTF8String& operator << (
-							UTF8String& u8str, setprecision prec);
-	friend UTF8String& operator << (
-							UTF8String& u8str, IN_STD ios_base::fmtflags);
-	friend UTF8String operator + (
-							const UTF8String& us, const IN_STD string& str);
+	friend UTF8String& operator << (UTF8String& u8str, setprecision prec);
+	friend UTF8String& operator << (UTF8String& u8str, IN_STD ios_base::fmtflags);
+	friend UTF8String operator + (const UTF8String& us, const IN_STD string& str);
 	friend UTF8String operator + (const UTF8String& us, const char* str);
 	friend UTF8String operator + (const UTF8String& us1, const UTF8String& us2);
-
+#endif	// SWIG
 
 	/**
 	 * <P>
@@ -795,6 +793,7 @@ class ConsoleOutput		// v 4.2.0
 	const TkUtil::Charset& getCharset ( ) const
 	{ return _charset; }
 
+#ifndef SWIG
 	ConsoleOutput& operator << (const TkUtil::UTF8String&);
 	ConsoleOutput& operator << (unsigned long);
 	ConsoleOutput& operator << (double);
@@ -807,6 +806,7 @@ class ConsoleOutput		// v 4.2.0
 	friend ConsoleOutput& co_endl (ConsoleOutput&);
 	ConsoleOutput& operator << (ConsoleOutput& (*pf)(ConsoleOutput&))
 	{ return pf (*this); }	// Pour endl et autres manipulateurs.
+#endif	// SWIG
 
 	/**
 	 * @return	Une référence sur la sortie standard.
@@ -836,10 +836,11 @@ class ConsoleOutput		// v 4.2.0
 	TkUtil::Charset			_charset;
 };	// class ConsoleOutput
 
+#ifndef SWIG
 ConsoleOutput& operator << (ConsoleOutput&, std::_Setprecision);
 ConsoleOutput& operator << (ConsoleOutput&, std::_Setw);
 ConsoleOutput& co_endl (ConsoleOutput&);
-
+#endif	// SWIG
 
 
 //END_NAMESPACE_UTIL
