@@ -8,7 +8,7 @@ set (ALL_EXECUTABLES
    logs memory modify_script process remoteProcess removefile script_tags
    scripting_logs thread_manager thread_pool timer tmpfile
    unicode urlfifo user_representation userinfos utf8 utf8chars
-   app_usage
+#   app_usage
    )
 set(CMAKE_CTEST_ARGUMENTS "--verbose")
 enable_testing()

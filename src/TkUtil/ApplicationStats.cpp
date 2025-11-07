@@ -68,219 +68,114 @@ string ApplicationStats::getFileName (const string& appName, const string& logDi
 	
 void ApplicationStats::logUsage (const string& appName, const string& logDir)
 {
-	// En vue de ne pas altérer le comportement de l'application tout est effectuée dans un processus fils => exit (0) en toutes circonstances.
-	errno	= 0;
-	const pid_t	pid	= fork ( );
-	if ((pid_t)-1 == pid)
+	FILE*	file	= 0;
+	string	fileName;
+
+	try
+	{
+		if ((true == appName.empty ( )) || (true == logDir.empty ( )))
+		{
+			{
+				
+				ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : nom d'application ou répertoire des logs non renseigné (" << appName << "/" << logDir << ")." << co_endl;
+			}
+
+			return;		// Tolérance aux erreurs
+		}	// if ((true == appName.empty ( )) || (true == logDir.empty ( )))
+
+		// Le nom du fichier :
+		const Date		date;
+		const string	user (UserData (true).getName ( ));
+		fileName		= getFileName (appName, logDir, (unsigned long)date.getMonth ( ), date.getYear ( ));
+
+		file	= initLogSession (fileName);
+		if (0 == file)
+			return;			// Process père
+
+		{	// FileLock scope
+			FileLock	logLock (fileName, file);
+
+			// Lecture et actualisation des logs existants :
+			map<string, size_t>		logs;
+			char					name [256];
+			size_t					count	= 0, line	= 1;
+			bool					found	= false;
+			int						flag	= 0;
+			errno	= 0;
+			while (2 == (flag = fscanf (file, "%s\t%lu", name, &count)))
+			{
+				line++;
+				if (name == user)
+				{
+					found	= true;
+					count++;
+				}	// if (name == user)
+				logs.insert (pair<string, size_t> (name, count));
+				count	= 0;
+			}	// while (2 == fscanf (file, "%s\t%lu", name, &count))
+			if (0 != errno)
+			{
+				UTF8String	error (charset);
+				error << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << strerror (errno);
+				errno	= 0;
+				throw Exception (error);
+			}	// if (0 != errno)
+			else if ((flag < 2) && (EOF != flag))
+			{
+				UTF8String	error (charset);
+				error << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : fichier probablement corrompu.";
+				throw Exception (error);
+			}	// if (flag < 2)
+			if (false == found)
+				logs.insert (pair<string, size_t> (user, 1));
+		
+			// Réécriture des logs actualisés :
+			errno	= 0;
+			if (0 != fseek (file, 0, SEEK_SET))
+			{
+				UTF8String	error (charset);
+				error << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno);
+				errno	= 0;
+				throw Exception (error);
+			}	// if (0 != fseek (file, 0, SEEK_SET))
+	
+			for (map<string, size_t>::const_iterator itl = logs.begin ( ); logs.end ( ) != itl; itl++)
+			{
+				if (fprintf (file, "%s\t%lu\n", (*itl).first.c_str ( ), (*itl).second) < 0)
+				{
+					UTF8String	error (charset);
+					error << "Erreur lors de la réécriture du fichier de logs " << fileName << ".";
+					throw Exception (error);
+				}	// if (fprintf (file, "%s\t%lu\n", (*itl).first.c_str ( ), (*itl).second) < 0)
+			}	// for (map<string, size_t>::const_iterator itl = logs.begin ( ); logs.end ( ) != itl; itl++)
+
+			errno	= 0;
+			if (0 != fflush (file))
+			{
+				UTF8String	error (charset);
+				error << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno);
+				errno	= 0;
+				throw Exception (error);
+			}	// if (0 != fflush (file))
+
+		}	// FileLock scope
+	}
+	catch (const Exception& exc)
 	{
 		TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : échec de fork : " << strerror (errno) << co_endl;
-		return;
-	}	// if ((pid_t)-1 == pid)
-	if (0 != pid)
-	{
-		Process::killAtEnd (pid);
-		return;	// Parent
+		ConsoleOutput::cerr ( ) << exc.getFullMessage ( ) << co_endl;
 	}
-
-	// On détache complètement le fils du parent => peut importe qui fini en premier, l'autre ira jusqu'au bout :
-	const pid_t	sid	= setsid ( );
-	if ((pid_t)-1 == sid)
+	catch (...)
 	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : échec de setsid : " << strerror (errno) << co_endl;
-		}
-		exit (0);
-	}	// if ((pid_t)-1 == sid)
+		TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
+		ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : erreur non renseignée lors de l'écriture d'informations dans le fichier \"" << fileName << "\"." << co_endl;
+	}
 	
-	if ((true == appName.empty ( )) || (true == logDir.empty ( )))
+	if (0 != file)
 	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "ApplicationStats::logUsage : nom d'application ou répertoire des logs non renseigné (" << appName << "/" << logDir << ")." << co_endl;
-		}
-		exit (0);
-	}	// if ((true == appName.empty ( )) || (true == logDir.empty ( )))
-
-	// Le nom du fichier :
-	const Date		date;
-	const string	user (UserData (true).getName ( ));
-	UTF8String	fileName (getFileName (appName, logDir, (unsigned long)date.getMonth ( ), date.getYear ( )), Charset::UTF_8);
-
-	// On ouvre le fichier en lecture/écriture :
-	FILE* 		file	= fopen (fileName.utf8 ( ).c_str ( ), "r+");		// Ne créé pas le fichier => on le créé ci-dessous si nécessaire :
-	const bool	created	= NULL == file ? true : false;
-	file		= NULL == file ? fopen (fileName.utf8 ( ).c_str ( ), "a+") : file;
-	if (NULL == file)
-	{
-		try
-		{	// On peut avoir des exceptions de levées : chemin non traversable, ...
-			File	dir (logDir);
-			if ((false == dir.exists ( )) || (false == dir.isDirectory ( )) || (false == dir.isExecutable ( )) || (false == dir.isWritable ( )))
-			{
-				{
-					TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-					ConsoleOutput::cerr ( ) << "Erreur, " << logDir << " n'est pas un répertoire existant avec les droits en écriture pour vous." << co_endl;
-				}
-				exit (0);
-			}	// if ((false == dir.exists ( )) || (false == dir.isDirectory ( )) || ...
-			File	logFile (fileName.utf8 ( ));
-			if (false == logFile.isWritable ( ))
-			{
-				{
-					TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-					ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : absence de droits en écriture." << co_endl;
-				}
-				exit (0);
-			}	// if (false == logFile.isWritable ( ))
-		}
-		catch (const Exception& exc)
-		{
-			{
-				TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-				ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : " << exc.getFullMessage ( ) << co_endl;
-			}
-			exit (0);
-		}
-		catch (...)
-		{
-		}
-
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << " : erreur non documentée." << co_endl;
-		}
-
-        exit (0);
-	}	// if (NULL == file)
-
-	// Obtenir le descripteur de fichier :
-	int	fd	= fileno (file);
-	if (-1 == fd)
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors de l'ouverture du fichier de logs " << fileName << co_endl;
-		}
-        exit (0);
-	}	// if (-1 == fd)
-
-	// Appliquer un verrou exclusif sur le fichier de logs :
-	errno	= 0;
-	if (0 != flock (fd, LOCK_EX))
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors du verrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
-		}
 		fclose (file);
-		exit (0);
-	}	// if (0 != flock (fd, LOCK_EX))
-	
-	// Conférer aufichier les droits en écriture pour tous le monde si il vient d'être créé :
-	if (true == created)
-	{
-		if (0 != fchmod (fd, S_IRWXU | S_IRWXG | S_IRWXO))
-		{
-			{
-				TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-				ConsoleOutput::cerr ( ) << "Erreur lors du confèrement à autrui des droits en écriture sur le fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
-			}
-			fclose (file);
-			exit (0);
-
-		}	// if (0 != fchmod (fd, S_IRWXU | S_IRWXG | S_IRWXO))
-	}	// if (true == created)
-
-	// Lecture et actualisation des logs existants :
-	map<string, size_t>		logs;
-	char					name [256];
-	size_t					count	= 0, line	= 1;
-	bool					found	= false;
-	int						flag	= 0;
-	errno	= 0;
-	while (2 == (flag = fscanf (file, "%s\t%lu", name, &count)))
-	{
-		line++;
-		if (name == user)
-		{
-			found	= true;
-			count++;
-		}	// if (name == user)
-		logs.insert (pair<string, size_t> (name, count));
-		count	= 0;
-	}	// while (2 == fscanf (file, "%s\t%lu", name, &count))
-	if (0 != errno)
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : " << strerror (errno) << co_endl;
-		}
-		fclose (file);
-		exit (0);
-	}	// if (0 != errno)
-	else if ((flag < 2) && (EOF != flag))
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors de la lecture du fichier de logs " << fileName << " en ligne " << (unsigned long)line << " : fichier probablement corrompu." << co_endl;
-		}
-		fclose (file);
-		exit (0);
-	}	// if (flag < 2)
-	if (false == found)
-		logs.insert (pair<string, size_t> (user, 1));
-		
-	// Ecriture des logs actualisés :
-	errno	= 0;
-	if (0 != fseek (file, 0, SEEK_SET))
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
-		}
-		fclose (file);
-		exit (0);
-	}	// if (0 != fseek (file, 0, SEEK_SET))
-	
-	for (map<string, size_t>::const_iterator itl = logs.begin ( ); logs.end ( ) != itl; itl++)
-	{
-		if (fprintf (file, "%s\t%lu\n", (*itl).first.c_str ( ), (*itl).second) < 0)
-		{
-			{
-				TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-				ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << "."<< co_endl;
-			}
-			fclose (file);
-			exit (0);
-		}	// if (fprintf (file, "%s\t%lu\n", (*itl).first.c_str ( ), (*itl).second) < 0)
-	}	// for (map<string, size_t>::const_iterator itl = logs.begin ( ); logs.end ( ) != itl; itl++)
-	errno	= 0;
-	if (0 != fflush (file))
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors de la réécriture du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
-		}
-		fclose (file);
-		exit (0);
-	}	// if (0 != fflush (file))
-	
-	// Libération du verrou :
-	errno	= 0;
-	if (0 != flock (fd, LOCK_UN))
-	{
-		{
-			TermAutoStyle	as (cerr, AnsiEscapeCodes::blueFg);
-			ConsoleOutput::cerr ( ) << "Erreur lors du déverrouillage du fichier de logs " << fileName << " : " << strerror (errno) << co_endl;
-		}
-		fclose (file);
-	}	// if (0 != flock (fd, LOCK_UN))
-	
-	fclose (file);
-	file	= NULL;
-	fd		= -1;
+		file	= 0;
+	}	// if (0 != file)
 	
 	exit (0);
 }	// ApplicationStats::logUsage
