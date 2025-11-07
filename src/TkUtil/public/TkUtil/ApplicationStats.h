@@ -48,6 +48,18 @@ class ApplicationStats
 	static void logUsage (const std::string& appName, const std::string& logDir);
 
 	/**
+	 * Ajoute une utilisation de cette version de l'application pour un operating system et un chemin d'accès donnés.
+	 * L'opération se fait dans un processus détaché. Toute erreur rencontrée est affichée dans la console de lancement de l'application.
+	 * @param	appName	est le nom de l'application
+	 * @param	logDir	est le répertoire où sont stockés les fichiers de logs
+	 * @param	version est la version utilisée de l'application
+	 * @param	os est le nom du système d'exploitation (ou tout autre moyen de l'identifier)
+	 * @param	path est le chemin d'accès complet de l'application
+	 * @since	6.14.0
+	 */
+	static void logUsage (const std::string& appName, const std::string& logDir, const std::string& version, const std::string& os, const std::string& path);
+
+	/**
 	 * Rassemble les utilisations d'une application sur la période demandée et en affiche la synthèse dans le flux transmis en argument.
 	 * Toute erreur rencontrée est affichée dans la console de lancement de l'application.
 	 * @param	flux où est écrit la synthèse
@@ -61,6 +73,14 @@ class ApplicationStats
 
 
 	private :
+
+	/**
+	 * Effectue un fork, ouvre le fichier en lecture/réécriture avec les bons droits, ...
+	 * @return	un pointeur sur le fichier ouvert pour y écrire des informations (processus fils) ou 0 (processus père). Appelle exit (0) en cas d'erreur dans le
+	 *			processus fils (tolérance aux fautes).
+	 * @since	6.14.0
+	 */
+	static FILE* initLogSession (const std::string fullFileName);
 
 	/**
 	 * Charge les logs du fichiers ouvert transmis en argument dans la map transmise en second argument.

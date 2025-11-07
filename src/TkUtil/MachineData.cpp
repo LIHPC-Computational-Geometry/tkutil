@@ -38,7 +38,7 @@ OperatingSystem *				OperatingSystem::_currentOS	= 0;
 
 
 OperatingSystem::OperatingSystem ( )
-	: _name ( ), _version ("0.0.0"), _infos ( ), _numericInfos ( )
+	: _name ( ), _distribution (OS_DISTRIBUTION), _version ("0.0.0"), _infos ( ), _numericInfos ( )
 {
 	errno	= 0;
 
@@ -48,10 +48,8 @@ OperatingSystem::OperatingSystem ( )
 	if (-1 == retVal)
 	{
 		ConsoleOutput::cout ( )
-		     << "Erreur lors de l'initialisation des informations sur le "
-		     << "système d'exploitation de la machine "
-		     << MachineData::instance ( ).getCurrentHostName ( )
-		     << " : " << co_endl << strerror (errno) << ".";
+		     << "Erreur lors de l'initialisation des informations sur le système d'exploitation de la machine "
+		     << MachineData::instance ( ).getCurrentHostName ( ) << " : " << co_endl << strerror (errno) << ".";
 		errno	= 0;
 	}	// if (-1 == retVal)
 	else
@@ -64,18 +62,14 @@ OperatingSystem::OperatingSystem ( )
 		catch (const Exception& exc)
 		{
 			ConsoleOutput::cout ( )
-			     << "Erreur lors de l'initialisation des informations sur le "
-			     << "système d'exploitation de la machine "
-			     << MachineData::instance ( ).getCurrentHostName ( )
-			     << " : " << co_endl << exc.getFullMessage ( ) << ".";
+			     << "Erreur lors de l'initialisation des informations sur le système d'exploitation de la machine "
+			     << MachineData::instance ( ).getCurrentHostName ( ) << " : " << co_endl << exc.getFullMessage ( ) << ".";
 		}
 		catch (...)
 		{
 			ConsoleOutput::cout ( )
-			     << "Erreur lors de l'initialisation des informations sur le "
-			     << "système d'exploitation de la machine "
-			     << MachineData::instance ( ).getCurrentHostName ( )
-			     << " : " << co_endl << "Erreur non documentée." << ".";
+			     << "Erreur lors de l'initialisation des informations sur le système d'exploitation de la machine "
+			     << MachineData::instance ( ).getCurrentHostName ( ) << " : " << co_endl << "Erreur non documentée." << ".";
 		}
 		setInformations (osInfos.version);
 	}	// else if (0 != retVal)
@@ -305,36 +299,41 @@ OperatingSystem::OperatingSystem ( )
 			<< NumericServices::unsignedLongLongDigitsMax
 			<< '\n';
 
-		// numericInfos.utf8 ( ) : copie directe du buffer, mais ne doit
-		// contenir que des caractères ASCII.
+		// numericInfos.utf8 ( ) : copie directe du buffer, mais ne doit contenir que des caractères ASCII.
 		setNumericInformations (numericInfos.utf8 ( ));
 	}
 	catch (const Exception& exc)
 	{
 		ConsoleOutput::cout ( )
-		     << "Erreur lors de l'initialisation des informations numériques "
-		     << "sur le système d'exploitation de la machine "
-		     << MachineData::instance ( ).getCurrentHostName ( )
-		     << " : " << co_endl << exc.getFullMessage ( ) << ".";
+		     << "Erreur lors de l'initialisation des informations numériques sur le système d'exploitation de la machine "
+		     << MachineData::instance ( ).getCurrentHostName ( ) << " : " << co_endl << exc.getFullMessage ( ) << ".";
 	}
 	catch (const exception& e)
 	{
 		ConsoleOutput::cout ( )
-		     << "Erreur lors de l'initialisation des informations numériques "
-		     << "sur le système d'exploitation de la machine "
-		     << MachineData::instance ( ).getCurrentHostName ( )
-		     << " : " << co_endl << e.what ( ) << ".";
+		     << "Erreur lors de l'initialisation des informations numériques sur le système d'exploitation de la machine "
+		     << MachineData::instance ( ).getCurrentHostName ( ) << " : " << co_endl << e.what ( ) << ".";
 	}
 	catch (...)
 	{
 		ConsoleOutput::cout ( )
-		     << "Erreur lors de l'initialisation des informations numériques "
-		     << "sur le système d'exploitation de la machine "
-		     << MachineData::instance ( ).getCurrentHostName ( )
-		     << " : " << co_endl << "Erreur non documentée." << ".";
+		     << "Erreur lors de l'initialisation des informations numériques sur le système d'exploitation de la machine "
+		     << MachineData::instance ( ).getCurrentHostName ( ) << " : " << co_endl << "Erreur non documentée." << ".";
 	}
 }	// OperatingSystem::OperatingSystem
 
+
+OperatingSystem::OperatingSystem (const string& name, const Version& version, const string& infos, const string& numericInfos)
+	: _name (name), _version (version), _distribution (OS_DISTRIBUTION), _infos (infos), _numericInfos (numericInfos)
+{
+}	// OperatingSystem::OperatingSystem 
+
+
+OperatingSystem::OperatingSystem (const OperatingSystem& os)
+	: _name (os._name), _distribution (OS_DISTRIBUTION), _version (os._version), _infos (os._infos), _numericInfos (os._numericInfos)
+{
+}	// OperatingSystem::OperatingSystem
+	
 
 const OperatingSystem& OperatingSystem::instance ( )
 {
@@ -354,12 +353,9 @@ MachineData*		MachineData::_currentMachine	= 0;
 bool				MachineData::_instanciated	= false; // Lib non instanciée
 
 MachineData::MachineData ( )
-	: NetworkData ( ),
-	  _processorNum ((size_t)-1),
-	  _operatingSystem (OperatingSystem::instance ( )), _hardware ( )
+	: NetworkData ( ), _processorNum ((size_t)-1), _operatingSystem (OperatingSystem::instance ( )), _hardware ( )
 {
-	// LE CODE DOIT ETRE LE MEME DANS MachineData::MachineData (char) 
-	// POUR MachineData::_currentMachine.
+	// LE CODE DOIT ETRE LE MEME DANS MachineData::MachineData (char)  POUR MachineData::_currentMachine.
 	long	nbProcs	= -1;
 #ifdef _SC_NPROCESSORS_ONLN
 	nbProcs	= sysconf (_SC_NPROCESSORS_ONLN);
@@ -367,9 +363,7 @@ MachineData::MachineData ( )
 	nbProcs	= sysconf (_SC_NPROC_ONLN);
 #else
 	ConsoleOutput::cout ( )
-	     << "ERREUR dans MachineData::MachineData : "
-	     << "détermination impossible du nombre de processeurs de la "
-	     << "machine " << getHostName ( ) << co_endl << "\a";
+	     << "ERREUR dans MachineData::MachineData : détermination impossible du nombre de processeurs de la machine " << getHostName ( ) << co_endl << "\a";
 #endif	// _SC_NPROCESSORS_ONLN
 	_processorNum	= (size_t)nbProcs;
 
@@ -380,10 +374,8 @@ MachineData::MachineData ( )
 	if (-1 == retVal)
 	{
 		ConsoleOutput::cout ( )
-		     << "Erreur lors de l'initialisation des informations sur le "
-		     << "système matériel de la machine "
-		     << getCurrentHostName ( ) << " : " << co_endl << strerror (errno)
-		     << ".";
+		     << "Erreur lors de l'initialisation des informations sur le système matériel de la machine "
+		     << getCurrentHostName ( ) << " : " << co_endl << strerror (errno) << ".";
 		errno	= 0;
 	}	// if (-1 == retVal)
 	else
@@ -392,30 +384,21 @@ MachineData::MachineData ( )
 
 
 MachineData::MachineData (const MachineData& machine)
-	: NetworkData (machine),
-	  _processorNum (machine._processorNum),
-	  _operatingSystem (machine._operatingSystem),
-	  _hardware (machine._hardware)
+	: NetworkData (machine), _processorNum (machine._processorNum), _operatingSystem (machine._operatingSystem), _hardware (machine._hardware)
 {
 }	// MachineData::MachineData (const MachineData&)
 
 
 MachineData::MachineData (char)
-	: NetworkData ( ),
-	  _processorNum ((size_t)-1),
-	  _operatingSystem (OperatingSystem::instance ( )), _hardware ( )
+	: NetworkData ( ), _processorNum ((size_t)-1), _operatingSystem (OperatingSystem::instance ( )), _hardware ( )
 {
 	if (true == _instanciated)	// v 2.27.0
 	{	// Protection contre les (dé)chargements multiples de la bibliothèque
 		UTF8String	message (charset);
-		message << "ATTENTION. Chargement de la version "
-		     << UtilInfos::getVersion ( ).getVersion ( )
-		     << " de la bibliothèque TkUtil. Cette bibliothèque est déjà "
-		     << "chargée, et ce second chargement risque de provoquer un "
+		message << "ATTENTION. Chargement de la version " << UtilInfos::getVersion ( ).getVersion ( )
+		     << " de la bibliothèque TkUtil. Cette bibliothèque est déjà chargée, et ce second chargement risque de provoquer un "
 		     << "comportement anormal, voire un plantage, du logiciel."
-		     << "\nErreur détectée en ligne "
-		     << (unsigned long)__LINE__ << " du fichier "
-		     << (unsigned long)__FILE__ << "\n";
+		     << "\nErreur détectée en ligne " << (unsigned long)__LINE__ << " du fichier " << (unsigned long)__FILE__ << "\n";
 		ConsoleOutput::cout ( ) << message << co_endl;
 	}	// if (true == _instanciated)
 
@@ -429,9 +412,7 @@ MachineData::MachineData (char)
 	nbProcs	= sysconf (_SC_NPROC_ONLN);
 #else
 	ConsoleOutput::cout ( )
-	     << "ERREUR dans MachineData::MachineData : "
-	     << "détermination impossible du nombre de processeurs de la "
-	     << "machine " << getHostName ( ) << co_endl << "\a";
+	     << "ERREUR dans MachineData::MachineData : détermination impossible du nombre de processeurs de la machine " << getHostName ( ) << co_endl << "\a";
 #endif	// _SC_NPROCESSORS_ONLN
 	_processorNum	= (size_t)nbProcs;
 
@@ -442,10 +423,8 @@ MachineData::MachineData (char)
 	if (-1 == retVal)
 	{
 		ConsoleOutput::cout ( )
-		     << "Erreur lors de l'initialisation des informations sur le "
-		     << "système matériel de la machine "
-		     << getCurrentHostName ( ) << " : " << co_endl << strerror (errno)
-		     << ".";
+		     << "Erreur lors de l'initialisation des informations sur le système matériel de la machine "
+		     << getCurrentHostName ( ) << " : " << co_endl << strerror (errno) << ".";
 		errno	= 0;
 	}	// if (-1 == retVal)
 	else
@@ -474,15 +453,10 @@ MachineData::~MachineData ( )
 		if (false == _instanciated)
 		{
 			ConsoleOutput::cout ( )
-			     << "ATTENTION. Déchargement de la version "
-			     << UtilInfos::getVersion ( ).getVersion ( )
-			     << " de la bibliothèque TkUtil. Cette bibliothèque est déjà "
-			     << "déchargée, et ce second déchargement risque de provoquer "
-			     << "comportement anormal, voire un plantage, du logiciel."
-			     << co_endl
-			     << "Erreur détectée en ligne "
-			     << (unsigned long)__LINE__ << " du fichier "
-			     << (unsigned long)__FILE__ << co_endl;
+			     << "ATTENTION. Déchargement de la version " << UtilInfos::getVersion ( ).getVersion ( )
+			     << " de la bibliothèque TkUtil. Cette bibliothèque est déjà déchargée, et ce second déchargement risque de provoquer "
+			     << "comportement anormal, voire un plantage, du logiciel." << co_endl
+			     << "Erreur détectée en ligne " << (unsigned long)__LINE__ << " du fichier " << (unsigned long)__FILE__ << co_endl;
 		}	// if (false == _instanciated)
 
 		_instanciated	= false;
