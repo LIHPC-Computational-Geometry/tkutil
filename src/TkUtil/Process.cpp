@@ -446,10 +446,18 @@ void Process::initialize (char* envp [])
 }	// Process::initialize
 
 
-void Process::finalize ( )
+void Process::finalize (unsigned int delay)
 {
 	for (set<pid_t>::iterator itk = _toKill.begin ( ); _toKill.end ( ) != itk; itk++)
 	{
+		// int status	= 0;
+		// if ((0 != delay) && (0 == ::waitpid (*itk, &status, WNOHANG)))	// fonctionne également :)
+		if ((0 != delay) && (0 == ::kill (*itk, 0)))
+		{
+			::sleep (delay);
+			delay	= 0;
+		}	// if ((0 != delay) && (0 == ::kill (*itk, 0)))
+
 		int	res	= ::kill (*itk, SIGKILL);
 		if (0 != res)
 		{

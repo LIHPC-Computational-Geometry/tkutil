@@ -21,6 +21,7 @@ foreach (lib ${ALL_TARGETS})
    target_compile_options (${lib} PUBLIC ${MANDATORY_CXX_OPTIONS})
    target_compile_definitions (${lib} PRIVATE TOSTR_USES_CPP_IMPLEMENTATION)
    target_compile_definitions (${lib} PRIVATE UTIL_VERSION="${TK_UTIL_VERSION}")
+   target_compile_definitions (${lib} PRIVATE OS_DISTRIBUTION="${PLATFORM}")				# défini dans workarounds.cmake
    set_property (TARGET ${lib} PROPERTY VERSION ${TK_UTIL_VERSION})
    set_property (TARGET ${lib} PROPERTY SOVERSION ${TK_UTIL_MAJOR_VERSION})
 # Etre capable une fois installée de retrouver les libs utilisées (iconv ?), ... :

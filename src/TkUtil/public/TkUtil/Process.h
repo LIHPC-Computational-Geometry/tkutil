@@ -305,10 +305,12 @@ class Process
 	/**
 	 * Détruit tous les processus dont la destruction  a été confiée à cette classe. Ce peut être par exemple des processus
 	 * fils lancés via fork et non attendus.
+	 * @param		un délai (en secondes) accordés aux processus fils pour se terminer seuls si au moins l'un d'entre-eux
+	 *				n'est pas achevé.
 	 * @see			killAtEnd
 	 * @since		6.13.0
 	 */
-	static void finalize ( );
+	static void finalize (unsigned int delay = 0);
 	
 	/**
 	 * Délègue à cette classe le fait de tuer le processus de pid transmis en argument lorsque Process::finalize sera appelé.

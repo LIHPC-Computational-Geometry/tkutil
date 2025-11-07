@@ -18,8 +18,7 @@ class OperatingSystem
 	public :
 
 	/**
-	 * Constructeur par défaut. S'initialise avec les valeurs de la machine
-	 * sur lequel s'exécute le processus.
+	 * Constructeur par défaut. S'initialise avec les valeurs de la machine sur lequel s'exécute le processus.
 	 */
 	OperatingSystem ( );
 
@@ -30,26 +29,19 @@ class OperatingSystem
 	 * @param		Diverses informations sur le système d'exploitation.
 	 * @param		Diverses informations concernant les aspects numériques.
 	 */
-	OperatingSystem (const IN_STD string& name, const Version& version,
-	                 const IN_STD string& infos = "",
-	                 const IN_STD string& numericInfos = "")
-		: _name (name), _version (version), _infos (infos),
-		  _numericInfos (numericInfos)
-	{ }
+	OperatingSystem (const IN_STD string& name, const Version& version, const IN_STD string& infos = "", const IN_STD string& numericInfos = "");
 
 	/**
 	 * Constructeur de copie, opérateur = : RAS.
 	 */
-	OperatingSystem (const OperatingSystem& os)
-		: _name (os._name), _version (os._version), _infos (os._infos),
-		  _numericInfos (os._numericInfos)
-	{ }
+	OperatingSystem (const OperatingSystem& os);
 	OperatingSystem& operator = (const OperatingSystem& os)
 	{
 		if (&os != this)
 		{
 			_name			= os._name;
 			_version		= os._version;
+			_distribution	= os._distribution;
 			_infos			= os._infos;
 			_numericInfos	= os._numericInfos;
 		}
@@ -89,6 +81,15 @@ class OperatingSystem
 	 */
 	virtual void setVersion (const Version& version)
 	{ _version	= version; }
+	
+	/**
+	 * @return		La distibution du système d'exploitation (RedHat, Ubuntu, ...).
+	 * @warning		<B>Elle est obtenue à la compilation de la bibliothèque.</B>
+	 * @see			getName
+	 * @since		6.14.0
+	 */
+	virtual const IN_STD string& getDistribution ( ) const
+	{ return _distribution; }
 
 	/**
 	 * @return		Diverses informations sur le système d'exploitation.
@@ -128,6 +129,9 @@ class OperatingSystem
 
 	/** Le nom du système d'exploitation. */
 	IN_STD string					_name;
+	
+	/** La distibution du système d'exploitation (RedHat, Ubuntu, ...). */
+	IN_STD string					_distribution;		// v 6.14.0
 
 	/** La version du système d'exploitation. */
 	Version							_version;
