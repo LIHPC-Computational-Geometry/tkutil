@@ -419,8 +419,7 @@ bool UnicodeString::operator == (const UnicodeString& toCompare) const
 	if (length ( ) != toCompare.length ( ))
 		return false;
 
-	return 0 == memcmp (unicode ( ), toCompare.unicode ( ), 
-	                    length ( ) * sizeof (WChar_t));
+	return 0 == memcmp (unicode ( ), toCompare.unicode ( ), length ( ) * sizeof (WChar_t));
 }	// UnicodeString::operator ==
 
 
@@ -889,7 +888,8 @@ void UnicodeString::copy (const UnicodeString& str)
 	_length	= str.length ( );
 	_string	= new WChar_t [_length + 1];
 	CHECK_NULL_PTR_ERROR (_string)
-	memcpy (_string, str.unicode ( ), _length * sizeof (WChar_t));
+	if (0 != unicode ( ))	// v 6.14.1
+		memcpy (_string, str.unicode ( ), _length * sizeof (WChar_t));
 	_string [_length]	= 0;
 }	// UnicodeString::copy
 
@@ -903,7 +903,8 @@ void UnicodeString::copy (const WChar_t* str)
 	_length	= stringLength (str);
 	_string	= new WChar_t [_length + 1];
 	CHECK_NULL_PTR_ERROR (_string)
-	memcpy (_string, str, _length * sizeof (WChar_t));
+	if (0 != unicode ( ))	// v 6.14.1
+		memcpy (_string, str, _length * sizeof (WChar_t));
 	_string [_length]	= 0;
 }	// UnicodeString::copy
 
@@ -942,9 +943,10 @@ UnicodeString operator + (const UnicodeString& us1, const UnicodeString& us2)
 	const size_t	length	= us1.length ( ) + us2.length ( );
 	WChar_t*		str		= new WChar_t [length + 1];
 	CHECK_NULL_PTR_ERROR (str)
-	memcpy (str, us1.unicode ( ), us1.length ( ) * sizeof (WChar_t));
-	memcpy (str + us1.length ( ), us2.unicode ( ), 
-	        us2.length ( ) * sizeof (WChar_t));
+	if (0 != us1.unicode ( ))	// v 6.14.1
+		memcpy (str, us1.unicode ( ), us1.length ( ) * sizeof (WChar_t));
+	if (0 != us2.unicode ( ))	// v 6.14.1
+		memcpy (str + us1.length ( ), us2.unicode ( ), us2.length ( ) * sizeof (WChar_t));
 	str [length]	= 0;
 
 	UnicodeString	us (str);
