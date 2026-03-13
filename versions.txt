@@ -1,3 +1,18 @@
+Version 6.14.2 : 13/03/26
+=================
+
+Correctif binding swig concernant la classe UTFString. En python on peut maintenant effectuer :
+
+s = UTF8String ("Une chaîne de caractères", Charset.UTF_8)
+print (s.utf8 ( ))
+
+voire même :
+
+s = UTF8String ( )
+appelCplusPlus (s)
+print (s.utf8 ( ))
+
+
 Version 6.14.1 : 20/02/26
 =================
 
