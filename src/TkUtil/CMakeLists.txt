@@ -1,11 +1,12 @@
 set (CURRENT_PACKAGE_NAME "TkUtil")
 set (CURRENT_PACKAGE_MACRO_NAME "TK_UTIL")
 
-find_package (GUIToolkitsVariables)
+find_package (GUIToolkitsVariables 1.7 REQUIRED)
 
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
 include (${GUIToolkitsVariables_CMAKE_DIR}/workarounds.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/utilities.cmake)
 
 find_package (Iconv REQUIRED)
 
@@ -28,6 +29,7 @@ foreach (lib ${ALL_TARGETS})
    set_target_properties (${lib} PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
 # Vieux compilos/architectures (RH6, Bull, gcc 4.*)
    target_compile_definitions (${lib} PRIVATE WITHOUT_THREAD_LOCALE)
+   separate_debug_infos (${lib} ${CMAKE_INSTALL_PREFIX}/src)
 endforeach (lib)
 target_link_libraries (TkUtil PUBLIC ${Iconv_LIBRARIES})
 target_include_directories (TkUtil PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public>$<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)

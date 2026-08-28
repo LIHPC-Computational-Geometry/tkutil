@@ -1,12 +1,13 @@
 set (CURRENT_PACKAGE_NAME "TkUtilScripting")
 set (CURRENT_PACKAGE_MACRO_NAME "TK_UTIL_SCRIPTING")
 
-find_package (GUIToolkitsVariables)
+find_package (GUIToolkitsVariables 1.7 REQUIRED)
 
 include (${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 include (${GUIToolkitsVariables_CMAKE_DIR}/common.cmake)
 include (${GUIToolkitsVariables_CMAKE_DIR}/python_binding.cmake)
 include (${GUIToolkitsVariables_CMAKE_DIR}/workarounds.cmake)
+include (${GUIToolkitsVariables_CMAKE_DIR}/utilities.cmake)
 
 file (GLOB HEADERS public/${CURRENT_PACKAGE_NAME}/*.h)
 file (GLOB CPP_SOURCES *.i *.cpp)
@@ -55,6 +56,7 @@ message ("INSTALL RPATH=" "${CMAKE_PACKAGE_RPATH_DIR};${CMAKE_PYTHON_RPATH_DIR}"
 message ("INSTALL RPATH=" "${CMAKE_PACKAGE_RPATH_DIR};${CMAKE_PYTHON_RPATH_DIR};$ORIGIN/../${PYTHON_BINDING_DIR}")
 #   set_target_properties (${lib} PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1 INSTALL_RPATH "${CMAKE_PACKAGE_RPATH_DIR};${CMAKE_PYTHON_RPATH_DIR}")
    set_target_properties (${lib} PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1 INSTALL_RPATH "${CMAKE_PACKAGE_RPATH_DIR};$ORIGIN/../${PYTHON_BINDING_DIR}")
+   separate_debug_infos (${lib} ${CMAKE_INSTALL_PREFIX}/src)
 endforeach (lib)
 
 # INSTALLATION :
